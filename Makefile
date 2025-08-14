@@ -1,17 +1,31 @@
-.PHONY: sim_hover_bench rl_train_hover sysid_run bench_waypoints promote
+.PHONY: sim_hover_bench rl_train_hover sysid_run bench_waypoints promote \
+        sitl_x500 sitl_plane qgc sitl_qgc
 
 sim_hover_bench:
-\tpython scripts/evaluation/eval_perception.py --scenario hover_wind
+	python scripts/evaluation/eval_perception.py --scenario hover_wind
 
 rl_train_hover:
-\tpython scripts/training/rl_train.py --config configs/training/rl_hover.yaml
+	python scripts/training/rl_train.py --config configs/training/rl_hover.yaml
 
 sysid_run:
-\tpython scripts/sysid/run_sysid.py
+	python scripts/sysid/run_sysid.py
 
 bench_waypoints:
-\tpython scripts/evaluation/eval_perception.py --scenario waypoint_obstacles
+	python scripts/evaluation/eval_perception.py --scenario waypoint_obstacles
 
 promote:
-\tpython mlops/scripts/promote_model.py $${MODEL:+--model $(MODEL)}
+	python mlops/scripts/promote_model.py $${MODEL:+--model $(MODEL)}
 
+sitl_x500:
+	@[ -n "$$PX4_FIRMWARE" ] || (echo "Set PX4_FIRMWARE first"; exit 1)
+	cd $$PX4_FIRMWARE && PX4_SIM_MODEL=x500 make px4_sitl gz_x500
+
+sitl_plane:
+	@[ -n "$$PX4_FIRMWARE" ] || (echo "Set PX4_FIRMWARE first"; exit 1)
+	cd $$PX4_FIRMWARE && PX4_SIM_MODEL=plane make px4_sitl gz_plane
+
+qgc:
+	@~/Downloads/QGroundControl.AppImage || true
+
+sitl_qgc:
+	./scripts/dev_run_sitl_qgc.sh
