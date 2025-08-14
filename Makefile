@@ -56,4 +56,5 @@ mlflow_dummy:
 
 .PHONY: hover_pipeline
 hover_pipeline:
+	python3 scripts/pipelines/hover_and_record.py
 	ALT=6 HOLD=8 HZ=20 ./scripts/pipelines/run_hover_pipeline.sh
