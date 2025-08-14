@@ -53,3 +53,7 @@ mlflow_up:
 
 mlflow_dummy:
 	python3 scripts/evaluation/log_dummy_metrics.py
+
+.PHONY: hover_pipeline
+hover_pipeline:
+	ALT=6 HOLD=8 HZ=20 ./scripts/pipelines/run_hover_pipeline.sh
