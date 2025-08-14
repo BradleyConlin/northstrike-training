@@ -29,3 +29,12 @@ qgc:
 
 sitl_qgc:
 	./scripts/dev_run_sitl_qgc.sh
+
+.PHONY: sdk_smoke
+sdk_smoke:
+	python3 scripts/control/mavsdk_takeoff_land.py --alt 6 --hold 8
+
+.PHONY: stop_sitl
+stop_sitl:
+	- pkill -f px4_sitl_default || true
+	- pkill -f "gz sim" || pkill -f gazebo || true
