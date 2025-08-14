@@ -1,0 +1,1 @@
+- Batteries checked\n- GPS fix\n- Geofence loaded\n- RTL configured\n

@@ -1,0 +1,1 @@
+hover:\n  max_rms_pos_m: 0.25\n  success_rate: 0.98\nwaypoint:\n  max_cross_track_m: 1.0\n  collision_rate: 0.0\n

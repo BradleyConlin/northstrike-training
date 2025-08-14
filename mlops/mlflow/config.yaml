@@ -1,0 +1,1 @@
+tracking_uri: http://127.0.0.1:5000\nartifact_location: ./mlruns\nexperiments:\n  perception: perception-exp\n  control: control-exp\n  rl: rl-exp\npromotion_gates:\n  min_success_rate: 0.95\n  max_latency_ms: 50\n

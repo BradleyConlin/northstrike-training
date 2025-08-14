@@ -1,0 +1,1 @@
+name: Lint & Unit\non: [push, pull_request]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with: {python-version: '3.10'}\n      - run: pip install -r requirements.txt\n      - run: pip install pre-commit\n      - run: pre-commit run --all-files\n      - run: pytest -q\n

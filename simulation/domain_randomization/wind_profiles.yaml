@@ -1,0 +1,1 @@
+default:\n  wind_mps: [0,10]\n  gust_mps: [0,4]\n

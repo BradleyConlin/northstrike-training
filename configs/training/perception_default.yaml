@@ -1,0 +1,1 @@
+model: yolov8n\nimg_size: 640\nepochs: 100\n

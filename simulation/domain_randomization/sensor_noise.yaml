@@ -1,0 +1,1 @@
+default:\n  imu_std: [0.001, 0.02]\n  baro_std: [0.2, 1.5]\n  gps_hdop: [0.5, 2.0]\n

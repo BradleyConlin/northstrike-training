@@ -1,0 +1,1 @@
+horizon: 20\ndt: 0.05\nweights: {pos: 1.0, vel: 0.2, effort: 0.05}\n

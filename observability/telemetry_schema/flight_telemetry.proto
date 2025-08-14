@@ -1,0 +1,1 @@
+syntax = "proto3";\nmessage FlightTelemetry { double ts=1; }\n
