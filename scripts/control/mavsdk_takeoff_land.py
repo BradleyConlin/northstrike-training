@@ -9,7 +9,7 @@ from mavsdk import System
 
 async def run(alt: float, hold_s: float) -> None:
     drone = System()
-    await drone.connect(system_address="udpin://:14540")  # PX4 SITL SDK port
+    await drone.connect(system_address="udpin://0.0.0.0:14540")  # PX4 SITL SDK port
 
     # Wait for connection
     async for s in drone.core.connection_state():

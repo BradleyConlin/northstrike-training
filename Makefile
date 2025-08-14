@@ -38,3 +38,7 @@ sdk_smoke:
 stop_sitl:
 	- pkill -f px4_sitl_default || true
 	- pkill -f "gz sim" || pkill -f gazebo || true
+
+.PHONY: log_hover
+log_hover:
+	python3 scripts/logging/mavsdk_telemetry_record.py --out datasets/flight_logs/hover.csv --hz 20
