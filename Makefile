@@ -42,3 +42,14 @@ stop_sitl:
 .PHONY: log_hover
 log_hover:
 	python3 scripts/logging/mavsdk_telemetry_record.py --out datasets/flight_logs/hover.csv --hz 20
+
+.PHONY: hover_kpi
+hover_kpi:
+	python3 scripts/evaluation/hover_kpi_report.py --csv datasets/flight_logs/test_hover.csv
+
+.PHONY: mlflow_up mlflow_dummy
+mlflow_up:
+	./mlops/scripts/start_mlflow.sh
+
+mlflow_dummy:
+	python3 scripts/evaluation/log_dummy_metrics.py
