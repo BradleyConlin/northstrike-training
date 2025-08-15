@@ -1,232 +1,176 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
+import datetime as dt
 import json
 import math
 import os
-from argparse import ArgumentParser
-from dataclasses import dataclass
-from datetime import datetime
+import subprocess
 from pathlib import Path
-from typing import Iterable, List, Tuple
+from typing import List, Tuple
 
 import mlflow
+import pandas as pd
 from mlflow.tracking import MlflowClient
 
 
-# ---------- utils ----------
 def _set_mlflow() -> None:
-    """Use server from env or fall back to local file store."""
     uri = os.environ.get("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000")
+    mlflow.set_tracking_uri(uri)
     try:
-        mlflow.set_tracking_uri(uri)
-        MlflowClient().search_experiments()  # smoke test
+        MlflowClient().search_experiments()
         print(f"🛰️  MLflow tracking at {uri}")
     except Exception:
+        print("⚠️  MLflow server unreachable; logging to local ./mlflow_local")
         mlflow.set_tracking_uri("file:./mlflow_local")
-        print("⚠️  MLflow server unreachable; logging to local ./mlruns")
+        print("🛰️  MLflow tracking at file:./mlflow_local")
 
 
-def haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """Great-circle distance in meters."""
-    r = 6371000.0
-    p1 = math.radians(lat1)
-    p2 = math.radians(lat2)
-    dphi = math.radians(lat2 - lat1)
-    dlmb = math.radians(lon2 - lon1)
-    a = math.sin(dphi / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dlmb / 2) ** 2
-    return 2 * r * math.asin(math.sqrt(a))
+def _git_sha() -> str:
+    try:
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    except Exception:
+        return "unknown"
 
 
-# ---------- .plan parsing (supports coordinate[] and params[4..6]) ----------
-def load_plan(plan_path: Path) -> List[Tuple[float, float, float]]:
-    data = json.loads(plan_path.read_text())
-    items = data.get("mission", {}).get("items", [])
+def _github_base() -> str | None:
+    try:
+        url = subprocess.check_output(["git", "config", "remote.origin.url"], text=True).strip()
+        if url.startswith("git@github.com:"):
+            userrepo = url.split(":", 1)[1].removesuffix(".git")
+            return f"https://github.com/{userrepo}"
+        if url.startswith("https://github.com/"):
+            return url.removesuffix(".git")
+    except Exception:
+        pass
+    return None
+
+
+def _great_circle_m(lat1, lon1, lat2, lon2) -> float:
+    R = 6371000.0
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dlon / 2) ** 2
+    return 2 * R * math.asin(math.sqrt(a))
+
+
+def load_plan(path: Path) -> List[Tuple[float, float, float]]:
+    plan = json.loads(path.read_text())
+    items = plan.get("mission", {}).get("items", [])
     wps: List[Tuple[float, float, float]] = []
-
     for it in items:
-        if not isinstance(it, dict):
+        if int(it.get("command", 16)) != 16:  # MAV_CMD_NAV_WAYPOINT
             continue
-
-        coord = it.get("coordinate")
-        if isinstance(coord, list) and len(coord) >= 3:
-            lat, lon, alt = coord[:3]
-            wps.append((float(lat), float(lon), float(alt)))
-            continue
-
-        params = it.get("params")
-        if isinstance(params, list) and len(params) >= 7:
-            lat, lon, alt = params[4], params[5], params[6]
-            if None not in (lat, lon, alt):
-                wps.append((float(lat), float(lon), float(alt)))
-                continue
-
-        lat = it.get("latitude") or it.get("Latitude") or it.get("param5")
-        lon = it.get("longitude") or it.get("Longitude") or it.get("param6")
-        alt = it.get("altitude") or it.get("Altitude") or it.get("param7")
-        if all(v is not None for v in (lat, lon, alt)):
-            wps.append((float(lat), float(lon), float(alt)))
-
+        p = it.get("params", [])
+        if len(p) >= 7:
+            lat, lon, alt = float(p[4]), float(p[5]), float(p[6])
+            wps.append((lat, lon, alt))
     if not wps:
         raise ValueError("No waypoints in plan.")
     return wps
 
 
-# ---------- CSV loader ----------
-@dataclass
-class Sample:
-    t_s: float
-    lat: float
-    lon: float
-    rel_alt_m: float
+def compute_kpis(df: pd.DataFrame, wps: List[Tuple[float, float, float]]) -> dict:
+    if any(col not in df.columns for col in ["lat", "lon"]):
+        raise ValueError("CSV must contain lat/lon")
+    errs = []
+    for _, r in df.iterrows():
+        dmins = [_great_circle_m(r.lat, r.lon, lat, lon) for (lat, lon, _alt) in wps]
+        errs.append(min(dmins))
+    visited = sum(1 for e in errs if e < 5.0)  # within 5 m
+    s = pd.Series(errs, dtype=float)
+    return {
+        "visited": int(visited),
+        "total": int(len(wps)),
+        "mean_err_m": float(s.mean()),
+        "max_err_m": float(s.max()),
+    }
 
 
-def load_track(csv_path: Path) -> List[Sample]:
-    rows = []
-    for line in csv_path.read_text().strip().splitlines()[1:]:
-        t_s, lat, lon, alt, *_ = line.split(",")
-        rows.append(
-            Sample(
-                t_s=float(t_s),
-                lat=float(lat),
-                lon=float(lon),
-                rel_alt_m=float(alt),
-            )
-        )
-    if not rows:
-        raise ValueError("No samples in CSV.")
-    return rows
+def render_html(outdir: Path, csv_path: Path, kpis: dict) -> Path:
+    outdir.mkdir(parents=True, exist_ok=True)
+    html_path = outdir / "mission_report.html"
 
+    sha = _git_sha()
+    base = _github_base()
+    commit_link = f"{base}/commit/{sha}" if base else None
+    csv_link = f"{base}/blob/{sha}/{csv_path}" if base else None
+    local_csv = f"file://{csv_path.resolve()}"
 
-# ---------- KPI computation ----------
-@dataclass
-class MissionKPI:
-    total_wps: int
-    visited_wps: int
-    hit_radius_m: float
-    min_err_m: float
-    mean_err_m: float
-    max_err_m: float
+    meta = f"""
+    <p>
+      <b>CSV:</b> <a href="{local_csv}">{csv_path}</a>
+      &nbsp;|&nbsp; <b>Commit:</b> {('<a href="%s">%s</a>' % (commit_link, sha[:7])) if commit_link else sha}
+      {('&nbsp;|&nbsp; <a href="%s">view CSV @ commit</a>' % csv_link) if csv_link else ''}
+    </p>
+    """
 
-
-def compute_kpis(
-    wps: Iterable[Tuple[float, float, float]],
-    track: List[Sample],
-    hit_radius_m: float = 8.0,
-) -> MissionKPI:
-    waypoints = list(wps)
-    # min distance from each waypoint to any recorded sample (simple, robust)
-    per_wp_min = []
-    all_min_d = []  # min distance of each sample to nearest waypoint (for mean/RMS-ish)
-    for s in track:
-        nearest = min(haversine_m(s.lat, s.lon, lat, lon) for lat, lon, _ in waypoints)
-        all_min_d.append(nearest)
-    for lat, lon, _alt in waypoints:
-        dmin = min(haversine_m(s.lat, s.lon, lat, lon) for s in track)
-        per_wp_min.append(dmin)
-
-    visited = sum(d <= hit_radius_m for d in per_wp_min)
-    min_err = min(per_wp_min) if per_wp_min else float("nan")
-    mean_err = sum(all_min_d) / len(all_min_d) if all_min_d else float("nan")
-    max_err = max(all_min_d) if all_min_d else float("nan")
-    return MissionKPI(
-        total_wps=len(waypoints),
-        visited_wps=visited,
-        hit_radius_m=hit_radius_m,
-        min_err_m=min_err,
-        mean_err_m=mean_err,
-        max_err_m=max_err,
-    )
-
-
-# ---------- HTML report ----------
-def write_report(out_dir: Path, k: MissionKPI, csv_path: Path, plan_path: Path) -> Path:
-    out_dir.mkdir(parents=True, exist_ok=True)
-    html = f"""<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Mission KPI</title>
-<style>
-body{{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:24px}}
-.card{{border:1px solid #ddd;border-radius:12px;padding:16px;max-width:760px}}
-.kv{{display:grid;grid-template-columns:220px 1fr;row-gap:8px}}
-.kv div:first-child{{color:#666}}
-code{{background:#f6f8fa;padding:2px 6px;border-radius:6px}}
-</style></head>
+    body = f"""<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Mission KPIs</title>
+  <style>
+    body {{ font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; }}
+    code, pre {{ background: #f6f8fa; padding: 2px 6px; border-radius: 4px; }}
+    .kpi {{ font-size: 18px; margin: 8px 0; }}
+  </style>
+</head>
 <body>
-<h2>Mission KPI Report</h2>
-<div class="card">
-  <div class="kv">
-    <div>Plan</div><div><code>{plan_path}</code></div>
-    <div>Track CSV</div><div><code>{csv_path}</code></div>
-    <div>Total waypoints</div><div>{k.total_wps}</div>
-    <div>Visited within {k.hit_radius_m:.1f} m</div><div>{k.visited_wps} / {k.total_wps}</div>
-    <div>Min lateral error (m)</div><div>{k.min_err_m:.2f}</div>
-    <div>Mean lateral error (m)</div><div>{k.mean_err_m:.2f}</div>
-    <div>Max lateral error (m)</div><div>{k.max_err_m:.2f}</div>
-  </div>
-</div>
-</body></html>
+  <h1>Mission KPIs</h1>
+  {meta}
+  <div class="kpi">Visited: <b>{kpis['visited']}/{kpis['total']}</b></div>
+  <div class="kpi">Mean error: <b>{kpis['mean_err_m']:.2f} m</b></div>
+  <div class="kpi">Max error: <b>{kpis['max_err_m']:.2f} m</b></div>
+</body>
+</html>
 """
-    out_file = out_dir / "mission_report.html"
-    out_file.write_text(html)
-    return out_file
+    html_path.write_text(body)
+    return html_path
 
 
-# ---------- main ----------
 def main() -> None:
-    ap = ArgumentParser()
-    ap.add_argument(
-        "--csv",
-        type=Path,
-        default=Path("datasets/flight_logs/mission_latest.csv"),
-        help="Mission CSV (defaults to symlink mission_latest.csv)",
-    )
-    ap.add_argument(
-        "--plan",
-        type=Path,
-        required=True,
-        help="QGC .plan file",
-    )
-    ap.add_argument(
-        "--radius",
-        type=float,
-        default=8.0,
-        help="Waypoint hit radius (meters)",
-    )
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--csv", type=Path, required=True)
+    ap.add_argument("--plan", type=Path, required=True)
+    ap.add_argument("--outdir", type=Path, default=None)
+    ap.add_argument("--experiment", type=str, default="kpi-mission")
     args = ap.parse_args()
 
-    # resolve symlink to get run timestamp for the report folder name
-    csv_path = args.csv
-    try:
-        real_csv = csv_path.resolve(strict=True)
-    except FileNotFoundError:
-        raise SystemExit(f"CSV not found: {csv_path}")
-
+    df = pd.read_csv(args.csv)
     wps = load_plan(args.plan)
-    track = load_track(real_csv)
-    kpi = compute_kpis(wps, track, args.radius)
+    kpis = compute_kpis(df, wps)
 
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    out_dir = Path("benchmarks/reports") / f"mission_{ts}"
-    report = write_report(out_dir, kpi, real_csv, args.plan)
+    ts = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+    outdir = args.outdir or Path(f"benchmarks/reports/mission_{ts}")
+    html_path = render_html(outdir, args.csv, kpis)
 
-    # MLflow
     _set_mlflow()
-    mlflow.set_experiment("kpi-mission")
-    with mlflow.start_run(run_name=f"mission_{ts}"):
-        mlflow.log_param("plan", str(args.plan))
-        mlflow.log_param("hit_radius_m", args.radius)
-        mlflow.log_metric("visited_wp", kpi.visited_wps)
-        mlflow.log_metric("total_wp", kpi.total_wps)
-        mlflow.log_metric("min_err_m", kpi.min_err_m)
-        mlflow.log_metric("mean_err_m", kpi.mean_err_m)
-        mlflow.log_metric("max_err_m", kpi.max_err_m)
-        mlflow.log_artifact(str(report), artifact_path="report")
-
-    print(
-        f"✅ KPIs: visited {kpi.visited_wps}/{kpi.total_wps}, "
-        f"mean_err={kpi.mean_err_m:.2f} m, max_err={kpi.max_err_m:.2f} m"
-    )
-    print(f"🧾 Report: {report}")
+    mlflow.set_experiment(args.experiment)
+    with mlflow.start_run(run_name=f"mission_{ts}") as run:
+        mlflow.log_params({"schema_version": "1.0"})
+        mlflow.log_metrics(
+            {
+                "visited": kpis["visited"],
+                "mean_err_m": kpis["mean_err_m"],
+                "max_err_m": kpis["max_err_m"],
+            }
+        )
+        mlflow.log_artifact(str(html_path), artifact_path="report")
+        print(
+            f"🏃 View run {run.info.run_name} at: {mlflow.get_tracking_uri()}"
+            f"/#/experiments/{run.info.experiment_id}/runs/{run.info.run_id}"
+        )
+        print(
+            f"🧪 View experiment at: {mlflow.get_tracking_uri()}/#/experiments/{run.info.experiment_id}"
+        )
+        print(
+            f"✅ KPIs: visited {kpis['visited']}/{kpis['total']}, "
+            f"mean_err={kpis['mean_err_m']:.2f} m, max_err={kpis['max_err_m']:.2f} m"
+        )
+        print(f"🧾 Report: {html_path}")
 
 
 if __name__ == "__main__":
