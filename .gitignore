@@ -23,3 +23,7 @@ benchmarks/reports/
 # PX4 logs / artifacts
 *.ulg
 log/
+# keep a couple things under datasets/
+!datasets/schema_v1.json
+!datasets/README.md
+!datasets/flight_logs/.gitkeep
