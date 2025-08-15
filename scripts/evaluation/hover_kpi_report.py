@@ -24,8 +24,8 @@ def _set_mlflow() -> None:
         print(f"🛰️  MLflow tracking at {uri}")
     except Exception:
         print("⚠️  MLflow server unreachable; logging to local ./mlruns")
-        mlflow.set_tracking_uri("file:./mlruns")
-        print("🛰️  MLflow tracking at file:./mlruns")
+        mlflow.set_tracking_uri("file:./mlflow_local")
+        print("🛰️  MLflow tracking at file:./mlflow_local")
 
 
 def latlon_to_meters(lat: np.ndarray, lon: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
@@ -44,7 +44,9 @@ def compute_hover_kpis(df: pd.DataFrame) -> dict:
     # Prefer in-air samples if column exists; else use all rows.
     dfi = df.copy()
     if "in_air" in dfi.columns:
-        dfi = dfi[dfi["in_air"] == 1] or df.copy()
+        dfi = df[df["in_air"] == 1].copy() if "in_air" in df.columns else df.copy()
+    if dfi.empty:
+        dfi = df.copy()
 
     # Altitude error vs median (robust to brief takeoff/landing transients)
     rel_alt = dfi["rel_alt_m"].to_numpy(dtype=float)

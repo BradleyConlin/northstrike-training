@@ -57,4 +57,31 @@ mlflow_dummy:
 .PHONY: hover_pipeline
 hover_pipeline:
 	python3 scripts/pipelines/hover_and_record.py
-	ALT=6 HOLD=8 HZ=20 ./scripts/pipelines/run_hover_pipeline.sh
+
+.PHONY: mission_pipeline waypoint_kpi
+mission_pipeline:
+	python3 scripts/pipelines/mission_run_and_record.py --plan simulation/missions/v1.0/waypoints_demo.plan
+
+
+.PHONY: waypoint_kpi
+waypoint_kpi:
+	@f=$$(ls -t datasets/flight_logs/mission_*.csv 2>/dev/null | head -n1); \
+	test -n "$$f" || { echo "No mission_*.csv found. Run make mission_pipeline first."; exit 1; }; \
+	python3 scripts/evaluation/waypoint_kpi_report.py --csv "$$f" --plan simulation/missions/v1.0/waypoints_demo.plan
+
+.PHONY: stop_sdk
+stop_sdk:
+	- pkill -f mavsdk_server || true
+	- pkill -f mission_run_and_record.py || true
+	- pkill -f mavsdk_takeoff_land.py || true
+
+.PHONY: mlflow_up_bg mlflow_down
+mlflow_up_bg:
+	@nohup ./mlops/scripts/start_mlflow.sh > .mlflow.log 2>&1 &
+	@echo $$! > .mlflow.pid
+	@echo "MLflow started (PID $$(cat .mlflow.pid)) → http://127.0.0.1:5000"
+
+mlflow_down:
+	-@[ -f .mlflow.pid ] && kill "$$(cat .mlflow.pid)" 2>/dev/null || true
+	-@rm -f .mlflow.pid
+	@echo "MLflow stopped."

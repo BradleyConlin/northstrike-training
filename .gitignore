@@ -12,3 +12,14 @@ models/exported/
 .DS_Store
 .idea/
 .vscode/
+
+# ----- generated data / never commit -----
+mlflow_server/
+mlflow_artifacts/
+mlflow_local/
+mlruns/
+datasets/flight_logs/
+benchmarks/reports/
+# PX4 logs / artifacts
+*.ulg
+log/
