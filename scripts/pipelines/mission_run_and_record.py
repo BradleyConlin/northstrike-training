@@ -197,7 +197,10 @@ async def fly_mission(drone: System, items: List[MissionItem]) -> None:
     await upload_with_retry(drone, plan)
     await drone.action.arm()
     await asyncio.sleep(0.3)
+    print("▶️  Starting mission...")
+    await asyncio.sleep(0.3)
     await drone.mission.start_mission()
+    print("⏯️  Mission started")
 
     total = None
     async for p in drone.mission.mission_progress():
