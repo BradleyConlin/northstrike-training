@@ -27,3 +27,9 @@ log/
 !datasets/schema_v1.json
 !datasets/README.md
 !datasets/flight_logs/.gitkeep
+
+!datasets/schema_v1.json
+!datasets/README.md
+!datasets/flight_logs/
+datasets/flight_logs/**
+!datasets/flight_logs/.gitkeep
