@@ -43,3 +43,4 @@ datasets/**
 !datasets/flight_logs/
 datasets/flight_logs/**
 !datasets/flight_logs/.gitkeep
+.mlflow.log

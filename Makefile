@@ -85,3 +85,19 @@ mlflow_down:
 	-@[ -f .mlflow.pid ] && kill "$$(cat .mlflow.pid)" 2>/dev/null || true
 	-@rm -f .mlflow.pid
 	@echo "MLflow stopped."
+
+.PHONY: smoke_hover smoke_mission smoke
+smoke_hover:
+	$(MAKE) hover_pipeline
+	python3 scripts/evaluation/assert_hover_kpis.py \
+		--csv $$(ls -t datasets/flight_logs/hover_*.csv | head -n1) \
+		--min-samples 250 --max-hover-rms 1.6 --max-xy-rms 0.05
+
+smoke_mission:
+	$(MAKE) mission_pipeline
+	python3 scripts/evaluation/assert_mission_kpis.py \
+		--csv datasets/flight_logs/mission_latest.csv \
+		--plan simulation/missions/v1.0/waypoints_demo.plan \
+		--require-visited 5 --max-mean 12 --max-max 25
+
+smoke: smoke_hover smoke_mission
