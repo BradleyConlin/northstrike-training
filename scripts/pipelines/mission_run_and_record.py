@@ -1,90 +1,80 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-Single-process mission pipeline:
- - Connect to PX4 (udpin://0.0.0.0:14540)
- - Parse a QGC .plan (waypoints)
- - Convert to MAVSDK MissionItems
- - Upload with retries + timeouts (instrumented prints)
- - Start and monitor mission
- - Record telemetry to CSV (same System instance)
- - Symlink mission_latest.csv
-"""
+Mission pipeline (single process): load QGC .plan → connect to PX4 (SITL) →
+upload + start mission → record telemetry CSV → update mission_latest.csv.
 
-from __future__ import annotations
+- Uses udpin:// (correct endpoint for MAVSDK)
+- Explicit arm() before start (helps SITL)
+- Robust MissionItem builder across MAVSDK versions (signature introspection)
+- Timeouts + clear progress prints so you always know what’s happening
+
+CSV schema (matches datasets/schema_v1.json):
+t,lat,lon,abs_alt_m,rel_alt_m,vn,ve,vd,battery_pct,in_air
+"""
 
 import argparse
 import asyncio
 import csv
+import inspect
 import json
-from dataclasses import dataclass
-from datetime import datetime
+from math import nan
 from pathlib import Path
-from typing import List
+from time import monotonic
 
 from mavsdk import System
 from mavsdk.mission import MissionError, MissionItem, MissionPlan
 
-# ----------------------------- plan parsing ---------------------------------
+# ---------------------------- Utilities -------------------------------------
 
 
-@dataclass
-class Wp:
-    lat: float
-    lon: float
-    rel_alt_m: float
+def parse_qgc_plan(path: Path):
+    """Return list of (lat, lon, rel_alt_m) from a QGC .plan file."""
+    data = json.loads(path.read_text())
+    items = data.get("mission", {}).get("items", [])
+    if not items:
+        raise ValueError("No waypoints found in plan.")
 
-
-def parse_qgc_plan(plan_path: Path) -> List[Wp]:
-    data = json.loads(plan_path.read_text())
-    mission = data.get("mission", {})
-    items = mission.get("items", [])
-    wps: List[Wp] = []
-
+    wps = []
     for it in items:
-        # QGC "SimpleItem" usually has "coordinate": [lat, lon, rel_alt]
+        # Prefer "coordinate": [lat, lon, alt]
         coord = it.get("coordinate")
         if isinstance(coord, list) and len(coord) >= 3:
-            lat, lon, rel = float(coord[0]), float(coord[1]), float(coord[2])
-            wps.append(Wp(lat=lat, lon=lon, rel_alt_m=rel))
+            lat, lon, alt = float(coord[0]), float(coord[1]), float(coord[2])
+            wps.append((lat, lon, alt))
             continue
-
-        # Some plans stick it under "params" (rare in our use)
-        params = it.get("params")
-        if isinstance(params, list) and len(params) >= 8:
-            # QGC PARAM mapping (approx): [cmd, p1, p2, p3, p4, lat, lon, alt]
-            lat, lon, rel = float(params[5]), float(params[6]), float(params[7])
-            wps.append(Wp(lat=lat, lon=lon, rel_alt_m=rel))
+        # Fallback: QGC "params" (index 4..6) when present
+        params = it.get("params", [])
+        if isinstance(params, list) and len(params) >= 7:
+            lat, lon, alt = float(params[4]), float(params[5]), float(params[6])
+            wps.append((lat, lon, alt))
 
     if not wps:
-        raise ValueError("No waypoints found in plan.")
+        raise ValueError("No usable waypoint coordinates in plan.")
     return wps
 
 
 def to_mavsdk_items(waypoints):
-    """Convert our simple waypoints (lat, lon, alt) to MAVSDK MissionItem list,
-    filling all required fields across SDK versions."""
-    from math import nan
+    """
+    Convert simple (lat, lon, rel_alt) tuples to a MAVSDK MissionItem list.
+    Cross-version safe: we introspect MissionItem signature and pass only
+    supported kwargs; missing enum fields default to 0.
+    """
+    sig = inspect.signature(MissionItem)
+    accepted = set(sig.parameters.keys())
 
-    from mavsdk.mission import MissionItem
+    # Some SDK builds expect enum values; treat 0 as "NONE".
+    CAM_NONE = 0
+    VEH_NONE = 0
 
-    # Enums can be nested on MissionItem in newer SDKs; fall back to 0 if absent.
-    try:
-        CAM_NONE = MissionItem.CameraAction.NONE
-    except Exception:
-        CAM_NONE = 0
-    try:
-        VEH_NONE = MissionItem.VehicleAction.NONE
-    except Exception:
-        VEH_NONE = 0
-
-    items = []
+    out = []
     for lat, lon, rel_alt in waypoints:
         base = dict(
-            latitude_deg=float(lat),
-            longitude_deg=float(lon),
-            relative_altitude_m=float(rel_alt),
+            latitude_deg=lat,
+            longitude_deg=lon,
+            relative_altitude_m=rel_alt,
             speed_m_s=5.0,
-            is_fly_through=True,  # some SDKs use this…
+            is_fly_through=False,
             gimbal_pitch_deg=nan,
             gimbal_yaw_deg=nan,
             loiter_time_s=0.0,
@@ -95,188 +85,224 @@ def to_mavsdk_items(waypoints):
             camera_photo_distance_m=0.0,
             vehicle_action=VEH_NONE,
         )
-        # Try the modern signature first; if it fails, retry with older key name.
-        try:
-            item = MissionItem(**base)
-        except TypeError:
-            base["fly_through"] = base.pop("is_fly_through")  # older field name
-            item = MissionItem(**base)
-        items.append(item)
-    print(f"🧱 Built {len(items)} MissionItems")
-    return items
+        # keep only keys supported by the installed MAVSDK
+        filtered = {k: v for k, v in base.items() if k in accepted}
+        out.append(MissionItem(**filtered))
+    return out
 
 
-async def record_csv(drone: System, out_csv: Path, hz: float, stop: asyncio.Event) -> None:
-    dt = max(1.0 / float(hz), 0.02)
-    out_csv.parent.mkdir(parents=True, exist_ok=True)
-
-    pos_a = drone.telemetry.position()
-    vel_a = drone.telemetry.velocity_ned()
-    bat_a = drone.telemetry.battery()
-    air_a = drone.telemetry.in_air()
-
-    async def _next(aiter):
-        return await aiter.__anext__()
-
-    t0 = asyncio.get_event_loop().time()
-    with out_csv.open("w", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(
-            [
-                "t",
-                "lat",
-                "lon",
-                "abs_alt_m",
-                "rel_alt_m",
-                "vn",
-                "ve",
-                "vd",
-                "battery_pct",
-                "in_air",
-            ]
-        )
-
-        while not stop.is_set():
-            pos = await _next(pos_a)
-            vel = await _next(vel_a)
-            bat = await _next(bat_a)
-            in_air = await _next(air_a)
-
-            t_now = asyncio.get_event_loop().time() - t0
-            w.writerow(
-                [
-                    round(t_now, 3),
-                    getattr(pos, "latitude_deg", 0.0),
-                    getattr(pos, "longitude_deg", 0.0),
-                    getattr(pos, "absolute_altitude_m", 0.0),
-                    getattr(pos, "relative_altitude_m", 0.0),
-                    getattr(vel, "north_m_s", 0.0),
-                    getattr(vel, "east_m_s", 0.0),
-                    getattr(vel, "down_m_s", 0.0),
-                    round(getattr(bat, "remaining_percent", 1.0) * 100.0, 1),
-                    1 if in_air else 0,
-                ]
-            )
-            await asyncio.sleep(dt)
-
-
-# ------------------------------ mission ops ---------------------------------
-
-
-async def wait_ekf_ok(drone: System) -> None:
-    async for h in drone.telemetry.health():
-        if h.is_global_position_ok and h.is_home_position_ok and h.is_local_position_ok:
-            break
-        await asyncio.sleep(0.2)
-
-
-async def upload_with_retry2(drone: System, plan: MissionPlan, attempts: int = 3) -> None:
-    """Clear existing mission and upload with retries + timeouts + prints."""
-    for i in range(1, attempts + 1):
-        try:
-            print(f"🧹 Clearing mission (attempt {i}/{attempts})")
-            await asyncio.wait_for(drone.mission.clear_mission(), timeout=5)
-            await asyncio.sleep(0.2)
-
-            print("⬆️  Uploading mission...")
-            await asyncio.wait_for(drone.mission.upload_mission(plan), timeout=10)
-            print("✅ Mission upload OK")
-            return
-        except MissionError as e:
-            print(f"⚠️  MissionError during upload: {e}")
-        except asyncio.TimeoutError:
-            print("⏳ Upload/clear timed out")
-        if i == attempts:
-            raise
-        await asyncio.sleep(1.0)
-
-
-async def fly_mission(drone: System, items: List[MissionItem]) -> None:
-    plan = MissionPlan(items)
-
-    await upload_with_retry2(drone, plan, attempts=3)
-
-    print("▶️  Starting mission...")
-    await asyncio.sleep(0.3)
-    await drone.mission.start_mission()
-    print("⏯️  Mission started")
-
-    got_total = 0
-    async for prog in drone.mission.mission_progress():
-        total = prog.total_mission_items
-        cur = prog.current
-        if total != got_total and total > 0:
-            print(f"▶️  Mission started ({total} items)")
-            got_total = total
-        if total > 0 and cur >= total:
-            print("✅ Mission complete")
-            break
-
-
-# --------------------------------- main -------------------------------------
-
-
-async def connect_drone() -> System:
+async def connect_px4() -> System:
+    print("🔌 Connecting to PX4 (udpin://0.0.0.0:14540)…")
     drone = System()
     await drone.connect(system_address="udpin://0.0.0.0:14540")
+
+    # Wait until MAVSDK reports a system is discovered
     async for state in drone.core.connection_state():
         if state.is_connected:
+            print("✅ Connected to PX4")
             break
-    print("✅ Connected to PX4")
+
+    # Wait for EKF/home ok
+    async for health in drone.telemetry.health():
+        if health.is_home_position_ok and health.is_global_position_ok:
+            print("✅ EKF healthy & home set")
+            break
     return drone
 
 
-def out_csv_path() -> Path:
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return Path("datasets/flight_logs") / f"mission_{ts}.csv"
+async def upload_with_retry(drone: System, plan: MissionPlan, attempts: int = 3):
+    for i in range(1, attempts + 1):
+        try:
+            # Clearing first helps avoid PROTOCOL_ERROR across runs
+            try:
+                await drone.mission.clear_mission()
+                await asyncio.sleep(0.3)
+            except Exception:
+                pass
+            print("⬆️  Uploading mission…")
+            await asyncio.wait_for(drone.mission.upload_mission(plan), timeout=10)
+            print("✅ Mission upload OK")
+            return
+        except (MissionError, asyncio.TimeoutError) as e:
+            print(f"⚠️  upload_mission attempt {i}/{attempts} failed: {e}")
+            if i == attempts:
+                raise
+            await asyncio.sleep(1.0)
 
 
-async def main(plan_path: Path, hz: int) -> None:
+async def run_mission(drone: System):
+    # Explicit arm helps SITL; if it’s already armed, that’s fine.
+    try:
+        print("🔓 Arming…")
+        await asyncio.wait_for(drone.action.arm(), timeout=5)
+        print("✅ Armed")
+    except Exception as e:
+        print(f"ℹ️  arm() skipped/failed ({e}); mission may auto-arm.")
+
+    print("▶️  Starting mission…")
+    await asyncio.sleep(0.3)
+    await drone.mission.start_mission()
+    print("⏯️  Mission start requested")
+
+    # Quick confirmation of airborne
+    async def _wait_airborne():
+        async for ia in drone.telemetry.in_air():
+            if ia:
+                return
+
+    try:
+        await asyncio.wait_for(_wait_airborne(), timeout=10)
+        print("🛫 Airborne")
+    except asyncio.TimeoutError:
+        print("⚠️  Not airborne after 10s; continuing anyway…")
+
+    # Progress watcher (with timeout in case something stalls)
+    async def _wait_progress():
+        last_print = monotonic()
+        async for prog in drone.mission.mission_progress():
+            if prog.total > 0:
+                now = monotonic()
+                if now - last_print > 0.5:
+                    print(f"… progress {prog.current}/{prog.total}")
+                    last_print = now
+            if prog.total > 0 and prog.current >= prog.total:
+                return
+
+    try:
+        await asyncio.wait_for(_wait_progress(), timeout=300)
+        print("✅ Mission complete")
+    except asyncio.TimeoutError:
+        print("⚠️  Mission progress timeout (5 min). Requesting RTL.")
+        try:
+            await drone.action.return_to_launch()
+        except Exception:
+            pass
+
+    # Ensure landed
+    async def _wait_landed():
+        async for ia in drone.telemetry.in_air():
+            if not ia:
+                return
+
+    try:
+        await asyncio.wait_for(_wait_landed(), timeout=120)
+        print("✅ Landed & disarmed")
+    except asyncio.TimeoutError:
+        print("⚠️  Landed wait timeout")
+
+
+async def record_csv(drone: System, out_csv: Path, hz: int, stop_evt: asyncio.Event):
+    out_csv.parent.mkdir(parents=True, exist_ok=True)
+    period = 1.0 / max(1, hz)
+
+    # async generators
+    pos_a = drone.telemetry.position()
+    vel_a = drone.telemetry.velocity_ned()
+    bat_a = drone.telemetry.battery()
+    in_air_a = drone.telemetry.in_air()
+
+    # prime streams
+    pos = await pos_a.__anext__()
+    vel = await vel_a.__anext__()
+    bat = await bat_a.__anext__()
+    in_air = await in_air_a.__anext__()
+
+    t0 = monotonic()
+    with out_csv.open("w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(
+            ["t", "lat", "lon", "abs_alt_m", "rel_alt_m", "vn", "ve", "vd", "battery_pct", "in_air"]
+        )
+        while not stop_evt.is_set():
+            # sample latest
+            try:
+                pos = await asyncio.wait_for(pos_a.__anext__(), timeout=0.0)
+            except Exception:
+                pass
+            try:
+                vel = await asyncio.wait_for(vel_a.__anext__(), timeout=0.0)
+            except Exception:
+                pass
+            try:
+                bat = await asyncio.wait_for(bat_a.__anext__(), timeout=0.0)
+            except Exception:
+                pass
+            try:
+                in_air = await asyncio.wait_for(in_air_a.__anext__(), timeout=0.0)
+            except Exception:
+                pass
+
+            t = monotonic() - t0
+            w.writerow(
+                [
+                    f"{t:.3f}",
+                    getattr(pos, "latitude_deg", float("nan")),
+                    getattr(pos, "longitude_deg", float("nan")),
+                    getattr(pos, "absolute_altitude_m", float("nan")),
+                    getattr(pos, "relative_altitude_m", float("nan")),
+                    getattr(vel, "north_m_s", float("nan")),
+                    getattr(vel, "east_m_s", float("nan")),
+                    getattr(vel, "down_m_s", float("nan")),
+                    (
+                        round(getattr(bat, "remaining_percent", 1.0) * 100.0, 1)
+                        if hasattr(bat, "remaining_percent")
+                        else float("nan")
+                    ),
+                    1 if bool(in_air) else 0,
+                ]
+            )
+            await asyncio.sleep(period)
+    print(f"🧾 Log: {out_csv}")
+
+
+# ---------------------------- Main ------------------------------------------
+
+
+async def main(plan_path: Path, hz: int):
     print(f"📋 Loading plan: {plan_path}")
     wps = parse_qgc_plan(plan_path)
     print(f"📦 Parsed {len(wps)} waypoints")
 
-    print("🧱 Converting waypoints → MissionItems")
     items = to_mavsdk_items(wps)
     print(f"🧱 Built {len(items)} MissionItems")
 
-    drone = await connect_drone()
-    print("✅ EKF healthy & home set (waiting)...")
-    await wait_ekf_ok(drone)
-    print("✅ EKF healthy & home set")
+    drone = await connect_px4()
 
-    out_csv = out_csv_path()
+    plan = MissionPlan(items)
+    await upload_with_retry(drone, plan, attempts=3)
+
+    # start recorder
+    from datetime import datetime
+
+    ts_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+    out = Path("datasets/flight_logs") / f"mission_{ts_str}.csv"
     stop_evt = asyncio.Event()
-    rec_task = asyncio.create_task(record_csv(drone, out_csv, float(hz), stop_evt))
+    rec_task = asyncio.create_task(record_csv(drone, out, hz, stop_evt))
 
     try:
-        await fly_mission(drone, items)
-
-        async for in_air in drone.telemetry.in_air():
-            if not in_air:
-                print("✅ Landed & disarmed")
-                break
+        await run_mission(drone)
     finally:
         stop_evt.set()
-        await asyncio.wait_for(rec_task, timeout=5)
+        with contextlib.suppress(Exception):
+            await rec_task
 
-    out_csv.parent.mkdir(parents=True, exist_ok=True)
-    latest = out_csv.parent / "mission_latest.csv"
+    # Update "latest" symlink for convenience
+    latest = out.parent / "mission_latest.csv"
     try:
         if latest.exists() or latest.is_symlink():
             latest.unlink()
-        latest.symlink_to(out_csv.name)
+        latest.symlink_to(out.name)
+        print(f"🔗 Symlink: {latest} -> {out.name}")
     except Exception:
         pass
 
-    print(f"🧾 Log: {out_csv}")
-    print(f"🔗 Symlink: {latest} -> {out_csv.name}")
-
 
 if __name__ == "__main__":
+    import contextlib
+
     ap = argparse.ArgumentParser()
-    ap.add_argument("--plan", type=Path, required=True, help="Path to QGC .plan file")
-    ap.add_argument("--hz", type=int, default=20, help="Telemetry sampling rate")
+    ap.add_argument("--plan", type=Path, required=True, help="Path to QGC .plan")
+    ap.add_argument("--hz", type=int, default=20, help="Telemetry sampling Hz")
     args = ap.parse_args()
 
     asyncio.run(main(args.plan, args.hz))
