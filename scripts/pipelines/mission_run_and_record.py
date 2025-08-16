@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Iterable, List, Tuple
 
 from mavsdk import System
-from mavsdk.mission import MissionItem, MissionPlan
+from mavsdk.mission import MissionError, MissionItem, MissionPlan
 
 
 # ---------- QGC .plan parsing (supports coordinate[] and params[4..6]) ----------
@@ -174,11 +174,29 @@ async def record_telemetry(drone: System, csv_path: Path, hz: float = 10.0) -> N
 
 
 # ---------- Mission execution ----------
+
+
+async def upload_with_retry(drone, plan, attempts: int = 3):
+    """Clear existing mission and upload with retries."""
+    for i in range(1, attempts + 1):
+        try:
+            await drone.mission.clear_mission()
+            await asyncio.sleep(0.5)
+            await upload_with_retry(drone, plan)
+            return
+        except MissionError as e:
+            print(f"⚠️  upload_mission failed (attempt {i}/{attempts}): {e}")
+            if i == attempts:
+                raise
+            await asyncio.sleep(1.0)
+
+
 async def fly_mission(drone: System, items: List[MissionItem]) -> None:
     plan = MissionPlan(items)
     await drone.mission.clear_mission()
-    await drone.mission.upload_mission(plan)
+    await upload_with_retry(drone, plan)
     await drone.action.arm()
+    await asyncio.sleep(0.3)
     await drone.mission.start_mission()
 
     total = None
