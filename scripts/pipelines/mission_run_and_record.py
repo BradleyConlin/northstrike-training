@@ -60,68 +60,50 @@ def parse_qgc_plan(plan_path: Path) -> List[Wp]:
     return wps
 
 
-def to_mavsdk_items(wps: List[Wp]) -> List[MissionItem]:
-    """Build MissionItems, handling different MAVSDK signatures gracefully."""
-    items: List[MissionItem] = []
+def to_mavsdk_items(waypoints):
+    """Convert our simple waypoints (lat, lon, alt) to MAVSDK MissionItem list,
+    filling all required fields across SDK versions."""
+    from math import nan
 
-    # Try to discover nested CameraAction enum if present (older/newer API diff)
-    cam_enum = getattr(MissionItem, "CameraAction", None)
-    cam_none = cam_enum.NONE if cam_enum else None
+    from mavsdk.mission import MissionItem
 
-    for w in wps:
-        # Try the fullest signature available
+    # Enums can be nested on MissionItem in newer SDKs; fall back to 0 if absent.
+    try:
+        CAM_NONE = MissionItem.CameraAction.NONE
+    except Exception:
+        CAM_NONE = 0
+    try:
+        VEH_NONE = MissionItem.VehicleAction.NONE
+    except Exception:
+        VEH_NONE = 0
+
+    items = []
+    for lat, lon, rel_alt in waypoints:
+        base = dict(
+            latitude_deg=float(lat),
+            longitude_deg=float(lon),
+            relative_altitude_m=float(rel_alt),
+            speed_m_s=5.0,
+            is_fly_through=True,  # some SDKs use this…
+            gimbal_pitch_deg=nan,
+            gimbal_yaw_deg=nan,
+            loiter_time_s=0.0,
+            camera_action=CAM_NONE,
+            camera_photo_interval_s=0.0,
+            acceptance_radius_m=2.0,
+            yaw_deg=nan,
+            camera_photo_distance_m=0.0,
+            vehicle_action=VEH_NONE,
+        )
+        # Try the modern signature first; if it fails, retry with older key name.
         try:
-            kwargs = dict(
-                latitude_deg=w.lat,
-                longitude_deg=w.lon,
-                relative_altitude_m=w.rel_alt_m,
-                speed_m_s=5.0,
-                is_fly_through=False,
-                gimbal_pitch_deg=0.0,
-                gimbal_yaw_deg=0.0,
-                loiter_time_s=0.0,
-                camera_photo_interval_s=0.0,
-                acceptance_radius_m=2.0,
-                yaw_deg=float("nan"),
-                camera_photo_distance_m=0.0,
-            )
-            if cam_enum:
-                kwargs["camera_action"] = cam_none
-            item = MissionItem(**kwargs)
+            item = MissionItem(**base)
         except TypeError:
-            # Try a mid-level signature (no acceptance/yaw/photo_distance)
-            try:
-                kwargs = dict(
-                    latitude_deg=w.lat,
-                    longitude_deg=w.lon,
-                    relative_altitude_m=w.rel_alt_m,
-                    speed_m_s=5.0,
-                    is_fly_through=False,
-                    gimbal_pitch_deg=0.0,
-                    gimbal_yaw_deg=0.0,
-                    loiter_time_s=0.0,
-                    camera_photo_interval_s=0.0,
-                )
-                if cam_enum:
-                    kwargs["camera_action"] = cam_none
-                item = MissionItem(**kwargs)
-            except TypeError:
-                # Oldest minimal signature
-                item = MissionItem(
-                    latitude_deg=w.lat,
-                    longitude_deg=w.lon,
-                    relative_altitude_m=w.rel_alt_m,
-                    speed_m_s=5.0,
-                    is_fly_through=False,
-                    gimbal_pitch_deg=0.0,
-                    gimbal_yaw_deg=0.0,
-                )
+            base["fly_through"] = base.pop("is_fly_through")  # older field name
+            item = MissionItem(**base)
         items.append(item)
-
+    print(f"🧱 Built {len(items)} MissionItems")
     return items
-
-
-# ------------------------------ telemetry -----------------------------------
 
 
 async def record_csv(drone: System, out_csv: Path, hz: float, stop: asyncio.Event) -> None:
