@@ -1,0 +1,15 @@
+{
+  "version": "1",
+  "columns": [
+    {"name": "t", "type": "float", "units": "s", "desc": "monotonic time since start"},
+    {"name": "lat", "type": "float", "units": "deg"},
+    {"name": "lon", "type": "float", "units": "deg"},
+    {"name": "abs_alt_m", "type": "float", "units": "m", "desc": "AMSL"},
+    {"name": "rel_alt_m", "type": "float", "units": "m", "desc": "above home"},
+    {"name": "vn", "type": "float", "units": "m/s"},
+    {"name": "ve", "type": "float", "units": "m/s"},
+    {"name": "vd", "type": "float", "units": "m/s"},
+    {"name": "battery_pct", "type": "float", "units": "%"},
+    {"name": "in_air", "type": "int", "desc": "0/1 flag"}
+  ]
+}
