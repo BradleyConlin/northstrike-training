@@ -46,3 +46,7 @@ datasets/flight_logs/**
 .mlflow.log
 *.plan
 !simulation/missions/v1.0/waypoints_demo.plan
+
+# CI downloads
+logs/
+*.zip
