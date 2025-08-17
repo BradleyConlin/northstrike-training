@@ -101,3 +101,7 @@ smoke_mission:
 		--require-visited 5 --max-mean 12 --max-max 25
 
 smoke: smoke_hover smoke_mission
+
+.PHONY: plan_demo
+plan_demo:
+	python3 scripts/tools/gen_demo_plan.py --write-sha
