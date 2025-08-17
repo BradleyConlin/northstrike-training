@@ -1,202 +1,301 @@
-#!/usr/bin/env python3
+"""
+hover_kpi_report.py
+Lightweight, CI-friendly KPIs for hover logs.
+
+- Optional heavy deps are safely guarded (matplotlib, mlflow, jinja2, plotly).
+- Core logic depends only on numpy/pandas.
+- compute_hover_kpis(...) is the entrypoint used by tests.
+
+Usage (optional):
+  python -m scripts.evaluation.hover_kpi_report --csv path/to/log.csv --plot out.png
+"""
+
 from __future__ import annotations
 
-import argparse
+import json
 import math
-import os
-import time
-from pathlib import Path
-from typing import Tuple
+from dataclasses import dataclass
+from typing import Dict, Optional, Sequence, Tuple, Union
 
-import matplotlib.pyplot as plt
-import mlflow
 import numpy as np
 import pandas as pd
-from mlflow.tracking import MlflowClient
+
+# --- Optional deps guarded for CI ---
+try:
+    import matplotlib.pyplot as plt  # optional in CI
+except Exception:
+    plt = None
+
+try:
+    import mlflow  # optional in CI
+except Exception:
+    mlflow = None
+
+try:
+    from jinja2 import Template  # optional in CI
+except Exception:
+    Template = None
+
+try:
+    import plotly.express as px  # optional in CI
+except Exception:
+    px = None
 
 
-def _set_mlflow() -> None:
-    """Prefer HTTP server; fall back to local ./mlruns if the server isn't reachable."""
-    uri = os.environ.get("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000")
-    mlflow.set_tracking_uri(uri)
-    try:
-        MlflowClient().search_experiments()  # smoke test the server
-        print(f"🛰️  MLflow tracking at {uri}")
-    except Exception:
-        print("⚠️  MLflow server unreachable; logging to local ./mlruns")
-        mlflow.set_tracking_uri("file:./mlflow_local")
-        print("🛰️  MLflow tracking at file:./mlflow_local")
+# ---------- Helpers ----------
+def _find_col(df: pd.DataFrame, candidates: Sequence[str]) -> Optional[str]:
+    cols = {c.lower(): c for c in df.columns}
+    for name in candidates:
+        if name.lower() in cols:
+            return cols[name.lower()]
+    return None
 
 
-def latlon_to_meters(lat: np.ndarray, lon: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-    """Convert lat/lon deltas to local meters using an equirectangular approximation."""
-    lat0 = float(lat[0])
-    lon0 = float(lon[0])
-    k_lat = 111_320.0  # meters per degree latitude
-    k_lon = 111_320.0 * math.cos(math.radians(lat0))
-    dx = (lon - lon0) * k_lon
-    dy = (lat - lat0) * k_lat
-    return dx, dy
+def _time_col(df: pd.DataFrame) -> Optional[str]:
+    return _find_col(df, ["time_s", "t", "time", "timestamp", "sec", "secs"])
 
 
-def compute_hover_kpis(df: pd.DataFrame) -> dict:
-    """Compute basic hover KPIs from telemetry DataFrame."""
-    # Prefer in-air samples if column exists; else use all rows.
-    dfi = df.copy()
-    if "in_air" in dfi.columns:
-        dfi = df[df["in_air"] == 1].copy() if "in_air" in df.columns else df.copy()
-    if dfi.empty:
-        dfi = df.copy()
-
-    # Altitude error vs median (robust to brief takeoff/landing transients)
-    rel_alt = dfi["rel_alt_m"].to_numpy(dtype=float)
-    alt_ref = float(np.median(rel_alt))
-    alt_err = rel_alt - alt_ref
-    hover_rms_m = float(np.sqrt(np.mean(alt_err**2))) if len(alt_err) else 0.0
-    hover_max_dev_m = float(np.max(np.abs(alt_err))) if len(alt_err) else 0.0
-
-    # XY drift metrics (approx. local ENU)
-    lat = dfi["lat"].to_numpy(dtype=float)
-    lon = dfi["lon"].to_numpy(dtype=float)
-    if len(lat) and len(lon):
-        dx, dy = latlon_to_meters(lat, lon)
-        r = np.sqrt(dx**2 + dy**2)
-        xy_rms_m = float(np.sqrt(np.mean(r**2))) if len(r) else 0.0
-        xy_max_m = float(np.max(r)) if len(r) else 0.0
-    else:
-        xy_rms_m = 0.0
-        xy_max_m = 0.0
-
-    return {
-        "samples": int(len(dfi)),
-        "alt_ref_m": alt_ref,
-        "hover_rms_m": hover_rms_m,
-        "hover_max_dev_m": hover_max_dev_m,
-        "xy_rms_m": xy_rms_m,
-        "xy_max_m": xy_max_m,
-    }
+def _alt_col(df: pd.DataFrame) -> Optional[str]:
+    # Common altitude/vertical-position names
+    return _find_col(df, ["z", "alt", "altitude", "pos_z", "z_m", "height"])
 
 
-def make_plots(df: pd.DataFrame, outdir: Path, alt_ref_m: float) -> tuple[Path, Path]:
-    """Create altitude/time and XY drift plots; return their paths."""
-    outdir.mkdir(parents=True, exist_ok=True)
-
-    # Altitude over time
-    fig1 = plt.figure()
-    t = df["t"].to_numpy(dtype=float)
-    alt = df["rel_alt_m"].to_numpy(dtype=float)
-    plt.plot(t, alt, label="rel_alt_m")
-    plt.axhline(alt_ref_m, linestyle="--", label="ref (median)")
-    plt.xlabel("time [s]")
-    plt.ylabel("altitude [m]")
-    plt.title("Altitude over time")
-    plt.legend()
-    p1 = outdir / "altitude_over_time.png"
-    fig1.tight_layout()
-    fig1.savefig(p1, dpi=120)
-    plt.close(fig1)
-
-    # XY drift scatter (approx ENU)
-    fig2 = plt.figure()
-    dx, dy = latlon_to_meters(df["lat"].to_numpy(), df["lon"].to_numpy())
-    plt.plot(dx, dy, ".", markersize=2)
-    plt.xlabel("east [m]")
-    plt.ylabel("north [m]")
-    plt.title("XY drift (ENU approx)")
-    plt.axis("equal")
-    p2 = outdir / "xy_drift.png"
-    fig2.tight_layout()
-    fig2.savefig(p2, dpi=120)
-    plt.close(fig2)
-
-    return p1, p2
+def _sp_alt_col(df: pd.DataFrame) -> Optional[str]:
+    # Common setpoint names for altitude
+    return _find_col(df, ["z_sp", "alt_sp", "setpoint_z", "target_z", "z_des", "altitude_des"])
 
 
-def write_html(outdir: Path, kpis: dict, p1: Path, p2: Path) -> Path:
-    """Write a simple HTML report that embeds the plots and KPI table."""
-    html = f"""<!doctype html>
-<html><head><meta charset="utf-8"><title>Hover KPI Report</title>
-<style>
-body{{font-family:system-ui,Arial,sans-serif;margin:24px;}}
-table{{border-collapse:collapse;margin-bottom:16px;}}
-td,th{{border:1px solid #ccc;padding:6px 10px;text-align:left;}}
-img{{max-width:48%;}}
-</style></head><body>
-<h2>Hover KPI Report</h2>
-<table>
-<tr><th>Samples</th><td>{kpis['samples']}</td></tr>
-<tr><th>Altitude ref (m)</th><td>{kpis['alt_ref_m']:.2f}</td></tr>
-<tr><th>Altitude RMS (m)</th><td>{kpis['hover_rms_m']:.3f}</td></tr>
-<tr><th>Altitude max dev (m)</th><td>{kpis['hover_max_dev_m']:.3f}</td></tr>
-<tr><th>XY RMS (m)</th><td>{kpis['xy_rms_m']:.3f}</td></tr>
-<tr><th>XY max (m)</th><td>{kpis['xy_max_m']:.3f}</td></tr>
-</table>
-<div>
-  <img src="{p1.name}" alt="Altitude over time">
-  <img src="{p2.name}" alt="XY drift">
-</div>
-</body></html>"""
-    out = outdir / "hover_report.html"
-    out.write_text(html, encoding="utf-8")
-    return out
+def _xy_cols(df: pd.DataFrame) -> Tuple[Optional[str], Optional[str]]:
+    x = _find_col(df, ["x", "pos_x", "x_m"])
+    y = _find_col(df, ["y", "pos_y", "y_m"])
+    return x, y
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--csv", required=True, help="Telemetry CSV (from recorder)")
-    ap.add_argument(
-        "--outdir",
-        default=None,
-        help="Output directory (defaults to benchmarks/reports/hover_YYYYMMDD_HHMMSS)",
-    )
-    ap.add_argument("--experiment", default="kpi-hover", help="MLflow experiment name")
-    args = ap.parse_args()
+def _valid_numeric(series: pd.Series) -> pd.Series:
+    return pd.to_numeric(series, errors="coerce")
 
-    csv_path = Path(args.csv)
-    df = pd.read_csv(csv_path)
 
-    kpis = compute_hover_kpis(df)
+@dataclass
+class HoverKPIs:
+    n: int
+    duration_s: float
+    alt_mean: float
+    alt_std: float
+    alt_rmse: Optional[float]
+    max_alt_dev: Optional[float]
+    xy_std: Optional[float]
+    hover_score: Optional[float]  # 0..1 (higher is better)
 
-    ts = time.strftime("%Y%m%d_%H%M%S")
-    outdir = Path(args.outdir) if args.outdir else Path("benchmarks/reports") / f"hover_{ts}"
-    outdir.mkdir(parents=True, exist_ok=True)
+    def to_dict(self) -> Dict[str, Union[int, float, None]]:
+        return {
+            "n": self.n,
+            "duration_s": float(self.duration_s),
+            "alt_mean": float(self.alt_mean) if not math.isnan(self.alt_mean) else float("nan"),
+            "alt_std": float(self.alt_std) if not math.isnan(self.alt_std) else float("nan"),
+            "alt_rmse": float(self.alt_rmse) if self.alt_rmse is not None else None,
+            "max_alt_dev": float(self.max_alt_dev) if self.max_alt_dev is not None else None,
+            "xy_std": float(self.xy_std) if self.xy_std is not None else None,
+            "hover_score": float(self.hover_score) if self.hover_score is not None else None,
+        }
 
-    p1, p2 = make_plots(df, outdir, kpis["alt_ref_m"])
-    html = write_html(outdir, kpis, p1, p2)
 
-    _set_mlflow()
-    mlflow.set_experiment(args.experiment)
-    with mlflow.start_run(run_name=f"hover_{ts}") as run:
-        mlflow.log_params({"csv": str(csv_path), "samples": kpis["samples"]})
-        mlflow.log_metrics(
-            {
-                "hover_rms_m": kpis["hover_rms_m"],
-                "hover_max_dev_m": kpis["hover_max_dev_m"],
-                "xy_rms_m": kpis["xy_rms_m"],
-                "xy_max_m": kpis["xy_max_m"],
-            }
-        )
-        mlflow.log_artifacts(str(outdir))
+# ---------- Core KPI function ----------
+def compute_hover_kpis(
+    data: Optional[pd.DataFrame] = None,
+    *,
+    df: Optional[pd.DataFrame] = None,
+    csv_path: Optional[str] = None,
+    sampling_hz: Optional[float] = None,
+) -> Dict[str, Union[int, float, None]]:
+    """
+    Compute basic hover KPIs from a DataFrame or CSV.
 
-        # Print helpful links if tracking via HTTP
+    Parameters
+    ----------
+    data/df : pandas.DataFrame
+        Telemetry table; common columns are auto-detected.
+    csv_path : str
+        Path to CSV if DataFrame not provided.
+    sampling_hz : float, optional
+        Used only if no time column is present, to estimate duration.
+
+    Returns
+    -------
+    dict:
+        {
+          n, duration_s, alt_mean, alt_std, alt_rmse, max_alt_dev, xy_std, hover_score
+        }
+    """
+    if df is None:
+        df = data
+    if df is None and csv_path is not None:
+        df = pd.read_csv(csv_path)
+
+    if df is None or not isinstance(df, pd.DataFrame) or df.empty:
+        return HoverKPIs(
+            n=0,
+            duration_s=0.0,
+            alt_mean=float("nan"),
+            alt_std=float("nan"),
+            alt_rmse=None,
+            max_alt_dev=None,
+            xy_std=None,
+            hover_score=None,
+        ).to_dict()
+
+    # Copy, coerce numeric
+    df = df.copy()
+    # Identify columns
+    t_col = _time_col(df)
+    z_col = _alt_col(df)
+    zsp_col = _sp_alt_col(df)
+    x_col, y_col = _xy_cols(df)
+
+    # Coerce numeric for used columns
+    if t_col:
+        df[t_col] = _valid_numeric(df[t_col])
+    if z_col:
+        df[z_col] = _valid_numeric(df[z_col])
+    if zsp_col:
+        df[zsp_col] = _valid_numeric(df[zsp_col])
+    if x_col:
+        df[x_col] = _valid_numeric(df[x_col])
+    if y_col:
+        df[y_col] = _valid_numeric(df[y_col])
+
+    df = df.replace([np.inf, -np.inf], np.nan).dropna(how="all")
+
+    n = len(df.index)
+    duration_s = 0.0
+    if t_col and df[t_col].notna().any():
+        t = df[t_col].dropna()
+        if len(t) >= 2:
+            duration_s = float(t.iloc[-1] - t.iloc[0])
+    elif sampling_hz and sampling_hz > 0:
+        duration_s = float(n / sampling_hz)
+
+    alt_mean = float("nan")
+    alt_std = float("nan")
+    alt_rmse = None
+    max_alt_dev = None
+
+    if z_col and df[z_col].notna().any():
+        z = df[z_col].dropna().astype(float)
+        alt_mean = float(z.mean())
+        alt_std = float(z.std(ddof=0))
+
+        if zsp_col and df[zsp_col].notna().any():
+            zsp = df[zsp_col].dropna().astype(float)
+            # Align by index
+            joined = pd.concat([z, zsp], axis=1, join="inner").dropna()
+            if joined.shape[0] > 0:
+                err = (joined.iloc[:, 0] - joined.iloc[:, 1]).to_numpy()
+                alt_rmse = float(np.sqrt(np.mean(err**2)))
+                max_alt_dev = float(np.max(np.abs(err)))
+        else:
+            # Without setpoint, characterize stability by std and peak-to-mean
+            alt_rmse = None
+            max_alt_dev = float(np.max(np.abs(z - z.mean()))) if len(z) else None
+
+    xy_std = None
+    if x_col and y_col and df[x_col].notna().any() and df[y_col].notna().any():
+        xs = df[x_col].dropna().to_numpy(dtype=float)
+        ys = df[y_col].dropna().to_numpy(dtype=float)
+        # Standard deviation of radial distance from mean hover point
+        r = np.sqrt((xs - xs.mean()) ** 2 + (ys - ys.mean()) ** 2)
+        xy_std = float(r.std(ddof=0)) if r.size > 0 else None
+
+    # Simple composite score (bounded 0..1), higher is better.
+    # Uses alt_std and xy_std if present; penalizes large deviations.
+    def _score(val: Optional[float], good: float, bad: float) -> Optional[float]:
+        # Map val in [good..bad] -> [1..0]
+        if val is None or math.isnan(val):
+            return None
+        if val <= good:
+            return 1.0
+        if val >= bad:
+            return 0.0
+        return float(1.0 - (val - good) / (bad - good))
+
+    s_alt = _score(alt_std, good=0.05, bad=0.5)  # meters
+    s_xy = _score(xy_std, good=0.05, bad=1.0)  # meters
+    parts = [v for v in (s_alt, s_xy) if v is not None]
+    hover_score = float(np.mean(parts)) if parts else None
+
+    kpis = HoverKPIs(
+        n=int(n),
+        duration_s=float(duration_s),
+        alt_mean=alt_mean,
+        alt_std=alt_std,
+        alt_rmse=alt_rmse,
+        max_alt_dev=max_alt_dev,
+        xy_std=xy_std,
+        hover_score=hover_score,
+    ).to_dict()
+
+    # Optional MLflow logging (no-op if mlflow is missing)
+    if mlflow:
         try:
-            uri = mlflow.get_tracking_uri()
-            if uri.startswith("http"):
-                exp_id = run.info.experiment_id
-                run_id = run.info.run_id
-                print(
-                    f"🏃 View run {run.data.tags.get('mlflow.runName', run_id)} at: "
-                    f"{uri}/#/experiments/{exp_id}/runs/{run_id}"
-                )
-                print(f"🧪 View experiment at: {uri}/#/experiments/{exp_id}")
+            with mlflow.start_run(run_name="hover_kpis"):
+                for k, v in kpis.items():
+                    if isinstance(v, (int, float)) and not (isinstance(v, float) and math.isnan(v)):
+                        mlflow.log_metric(k, float(v))
         except Exception:
             pass
 
-    # Console summary
-    pretty = {k: (round(v, 4) if isinstance(v, float) else v) for k, v in kpis.items()}
-    print("✅ KPIs:", pretty)
-    print(f"🧾 Report: {html}")
+    return kpis
+
+
+# ---------- Plotting (optional) ----------
+def render_hover_plot(
+    df: pd.DataFrame,
+    *,
+    save_path: Optional[str] = None,
+    title: str = "Hover Altitude",
+) -> None:
+    """Simple altitude plot; no-op if matplotlib is unavailable."""
+    if plt is None:
+        return
+    if df is None or df.empty:
+        return
+
+    t_col = _time_col(df)
+    z_col = _alt_col(df)
+    if not z_col:
+        return
+
+    t = df[t_col] if t_col else np.arange(len(df[z_col]), dtype=float)
+    z = df[z_col]
+    plt.figure(figsize=(8, 3))
+    plt.plot(t, z, linewidth=1.5)
+    plt.xlabel("time [s]" if t_col else "sample")
+    plt.ylabel("altitude [m]")
+    plt.title(title)
+    plt.tight_layout()
+    if save_path:
+        plt.savefig(save_path, dpi=150)
+        plt.close()
+
+
+# ---------- CLI (optional) ----------
+def _main():
+    import argparse
+
+    p = argparse.ArgumentParser()
+    p.add_argument("--csv", type=str, required=True, help="Path to CSV with hover telemetry")
+    p.add_argument(
+        "--sampling-hz", type=float, default=None, help="Sampling rate if no time column"
+    )
+    p.add_argument("--plot", type=str, default=None, help="Path to save a PNG plot (optional)")
+    args = p.parse_args()
+
+    df = pd.read_csv(args.csv)
+    kpis = compute_hover_kpis(df=df, sampling_hz=args.sampling_hz)
+    print(json.dumps(kpis, indent=2, sort_keys=True))
+
+    if args.plot:
+        render_hover_plot(df, save_path=args.plot)
 
 
 if __name__ == "__main__":
-    main()
+    _main()
