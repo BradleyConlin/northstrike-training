@@ -29,11 +29,37 @@ def _time_col(df: pd.DataFrame) -> Optional[str]:
 
 
 def _alt_col(df: pd.DataFrame) -> Optional[str]:
-    return _find_col(df, ["z", "alt", "altitude", "pos_z", "z_m", "height"])
+    # Common altitude/vertical-position names used in logs/tests
+    return _find_col(
+        df,
+        [
+            "rel_alt_m",  # relative altitude (m)
+            "abs_alt_m",  # absolute altitude (m)
+            "z",
+            "alt",
+            "altitude",
+            "pos_z",
+            "z_m",
+            "height",
+        ],
+    )
 
 
 def _sp_alt_col(df: pd.DataFrame) -> Optional[str]:
-    return _find_col(df, ["z_sp", "alt_sp", "setpoint_z", "target_z", "z_des", "altitude_des"])
+    # Common setpoint names for altitude
+    return _find_col(
+        df,
+        [
+            "rel_alt_sp_m",
+            "alt_sp_m",
+            "z_sp",
+            "alt_sp",
+            "setpoint_z",
+            "target_z",
+            "z_des",
+            "altitude_des",
+        ],
+    )
 
 
 def _xy_cols(df: pd.DataFrame) -> Tuple[Optional[str], Optional[str]]:
