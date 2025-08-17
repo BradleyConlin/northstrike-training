@@ -1,45 +1,18 @@
 """
-hover_kpi_report.py
-Lightweight, CI-friendly KPIs for hover logs.
-
-- Optional heavy deps are safely guarded (matplotlib, mlflow, jinja2, plotly).
-- Core logic depends only on numpy/pandas.
-- compute_hover_kpis(...) is the entrypoint used by tests.
-
-Usage (optional):
-  python -m scripts.evaluation.hover_kpi_report --csv path/to/log.csv --plot out.png
+hover_kpi_report.py (CI-safe)
+- Imports only numpy/pandas at module import time.
+- Plotting uses a lazy matplotlib import inside the function.
+- Returns keys expected by tests, including 'samples'.
 """
 
 from __future__ import annotations
 
 import json
 import math
-from dataclasses import dataclass
 from typing import Dict, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
-
-# --- Optional deps guarded for CI ---
-try:
-    import matplotlib.pyplot as plt  # optional in CI
-except Exception:
-    plt = None
-
-try:
-    import mlflow  # optional in CI
-except Exception:
-    mlflow = None
-
-try:
-    from jinja2 import Template  # optional in CI
-except Exception:
-    Template = None
-
-try:
-    import plotly.express as px  # optional in CI
-except Exception:
-    px = None
 
 
 # ---------- Helpers ----------
@@ -56,12 +29,10 @@ def _time_col(df: pd.DataFrame) -> Optional[str]:
 
 
 def _alt_col(df: pd.DataFrame) -> Optional[str]:
-    # Common altitude/vertical-position names
     return _find_col(df, ["z", "alt", "altitude", "pos_z", "z_m", "height"])
 
 
 def _sp_alt_col(df: pd.DataFrame) -> Optional[str]:
-    # Common setpoint names for altitude
     return _find_col(df, ["z_sp", "alt_sp", "setpoint_z", "target_z", "z_des", "altitude_des"])
 
 
@@ -75,30 +46,6 @@ def _valid_numeric(series: pd.Series) -> pd.Series:
     return pd.to_numeric(series, errors="coerce")
 
 
-@dataclass
-class HoverKPIs:
-    n: int
-    duration_s: float
-    alt_mean: float
-    alt_std: float
-    alt_rmse: Optional[float]
-    max_alt_dev: Optional[float]
-    xy_std: Optional[float]
-    hover_score: Optional[float]  # 0..1 (higher is better)
-
-    def to_dict(self) -> Dict[str, Union[int, float, None]]:
-        return {
-            "n": self.n,
-            "duration_s": float(self.duration_s),
-            "alt_mean": float(self.alt_mean) if not math.isnan(self.alt_mean) else float("nan"),
-            "alt_std": float(self.alt_std) if not math.isnan(self.alt_std) else float("nan"),
-            "alt_rmse": float(self.alt_rmse) if self.alt_rmse is not None else None,
-            "max_alt_dev": float(self.max_alt_dev) if self.max_alt_dev is not None else None,
-            "xy_std": float(self.xy_std) if self.xy_std is not None else None,
-            "hover_score": float(self.hover_score) if self.hover_score is not None else None,
-        }
-
-
 # ---------- Core KPI function ----------
 def compute_hover_kpis(
     data: Optional[pd.DataFrame] = None,
@@ -110,21 +57,8 @@ def compute_hover_kpis(
     """
     Compute basic hover KPIs from a DataFrame or CSV.
 
-    Parameters
-    ----------
-    data/df : pandas.DataFrame
-        Telemetry table; common columns are auto-detected.
-    csv_path : str
-        Path to CSV if DataFrame not provided.
-    sampling_hz : float, optional
-        Used only if no time column is present, to estimate duration.
-
-    Returns
-    -------
-    dict:
-        {
-          n, duration_s, alt_mean, alt_std, alt_rmse, max_alt_dev, xy_std, hover_score
-        }
+    Returns dict with keys:
+      samples, duration_s, alt_mean, alt_std, alt_rmse, max_alt_dev, xy_std, hover_score
     """
     if df is None:
         df = data
@@ -132,26 +66,26 @@ def compute_hover_kpis(
         df = pd.read_csv(csv_path)
 
     if df is None or not isinstance(df, pd.DataFrame) or df.empty:
-        return HoverKPIs(
-            n=0,
-            duration_s=0.0,
-            alt_mean=float("nan"),
-            alt_std=float("nan"),
-            alt_rmse=None,
-            max_alt_dev=None,
-            xy_std=None,
-            hover_score=None,
-        ).to_dict()
+        return {
+            "samples": 0,
+            "duration_s": 0.0,
+            "alt_mean": float("nan"),
+            "alt_std": float("nan"),
+            "alt_rmse": None,
+            "max_alt_dev": None,
+            "xy_std": None,
+            "hover_score": None,
+        }
 
-    # Copy, coerce numeric
     df = df.copy()
+
     # Identify columns
     t_col = _time_col(df)
     z_col = _alt_col(df)
     zsp_col = _sp_alt_col(df)
     x_col, y_col = _xy_cols(df)
 
-    # Coerce numeric for used columns
+    # Coerce numeric
     if t_col:
         df[t_col] = _valid_numeric(df[t_col])
     if z_col:
@@ -165,7 +99,7 @@ def compute_hover_kpis(
 
     df = df.replace([np.inf, -np.inf], np.nan).dropna(how="all")
 
-    n = len(df.index)
+    n = int(len(df.index))
     duration_s = 0.0
     if t_col and df[t_col].notna().any():
         t = df[t_col].dropna()
@@ -176,8 +110,8 @@ def compute_hover_kpis(
 
     alt_mean = float("nan")
     alt_std = float("nan")
-    alt_rmse = None
-    max_alt_dev = None
+    alt_rmse: Optional[float] = None
+    max_alt_dev: Optional[float] = None
 
     if z_col and df[z_col].notna().any():
         z = df[z_col].dropna().astype(float)
@@ -186,30 +120,24 @@ def compute_hover_kpis(
 
         if zsp_col and df[zsp_col].notna().any():
             zsp = df[zsp_col].dropna().astype(float)
-            # Align by index
             joined = pd.concat([z, zsp], axis=1, join="inner").dropna()
-            if joined.shape[0] > 0:
+            if len(joined) > 0:
                 err = (joined.iloc[:, 0] - joined.iloc[:, 1]).to_numpy()
                 alt_rmse = float(np.sqrt(np.mean(err**2)))
                 max_alt_dev = float(np.max(np.abs(err)))
         else:
-            # Without setpoint, characterize stability by std and peak-to-mean
-            alt_rmse = None
             max_alt_dev = float(np.max(np.abs(z - z.mean()))) if len(z) else None
 
-    xy_std = None
+    xy_std: Optional[float] = None
     if x_col and y_col and df[x_col].notna().any() and df[y_col].notna().any():
         xs = df[x_col].dropna().to_numpy(dtype=float)
         ys = df[y_col].dropna().to_numpy(dtype=float)
-        # Standard deviation of radial distance from mean hover point
         r = np.sqrt((xs - xs.mean()) ** 2 + (ys - ys.mean()) ** 2)
         xy_std = float(r.std(ddof=0)) if r.size > 0 else None
 
-    # Simple composite score (bounded 0..1), higher is better.
-    # Uses alt_std and xy_std if present; penalizes large deviations.
+    # Composite score (0..1), higher is better
     def _score(val: Optional[float], good: float, bad: float) -> Optional[float]:
-        # Map val in [good..bad] -> [1..0]
-        if val is None or math.isnan(val):
+        if val is None or (isinstance(val, float) and math.isnan(val)):
             return None
         if val <= good:
             return 1.0
@@ -222,39 +150,29 @@ def compute_hover_kpis(
     parts = [v for v in (s_alt, s_xy) if v is not None]
     hover_score = float(np.mean(parts)) if parts else None
 
-    kpis = HoverKPIs(
-        n=int(n),
-        duration_s=float(duration_s),
-        alt_mean=alt_mean,
-        alt_std=alt_std,
-        alt_rmse=alt_rmse,
-        max_alt_dev=max_alt_dev,
-        xy_std=xy_std,
-        hover_score=hover_score,
-    ).to_dict()
-
-    # Optional MLflow logging (no-op if mlflow is missing)
-    if mlflow:
-        try:
-            with mlflow.start_run(run_name="hover_kpis"):
-                for k, v in kpis.items():
-                    if isinstance(v, (int, float)) and not (isinstance(v, float) and math.isnan(v)):
-                        mlflow.log_metric(k, float(v))
-        except Exception:
-            pass
-
-    return kpis
+    return {
+        "samples": n,
+        "duration_s": float(duration_s),
+        "alt_mean": alt_mean,
+        "alt_std": alt_std,
+        "alt_rmse": alt_rmse,
+        "max_alt_dev": max_alt_dev,
+        "xy_std": xy_std,
+        "hover_score": hover_score,
+    }
 
 
-# ---------- Plotting (optional) ----------
+# ---------- Optional plotting (lazy import) ----------
 def render_hover_plot(
     df: pd.DataFrame,
     *,
     save_path: Optional[str] = None,
     title: str = "Hover Altitude",
 ) -> None:
-    """Simple altitude plot; no-op if matplotlib is unavailable."""
-    if plt is None:
+    """No-op if matplotlib is unavailable."""
+    try:
+        import matplotlib.pyplot as plt  # lazy, optional
+    except Exception:
         return
     if df is None or df.empty:
         return
@@ -277,16 +195,14 @@ def render_hover_plot(
         plt.close()
 
 
-# ---------- CLI (optional) ----------
+# ---------- CLI ----------
 def _main():
     import argparse
 
     p = argparse.ArgumentParser()
-    p.add_argument("--csv", type=str, required=True, help="Path to CSV with hover telemetry")
-    p.add_argument(
-        "--sampling-hz", type=float, default=None, help="Sampling rate if no time column"
-    )
-    p.add_argument("--plot", type=str, default=None, help="Path to save a PNG plot (optional)")
+    p.add_argument("--csv", type=str, required=True)
+    p.add_argument("--sampling-hz", type=float, default=None)
+    p.add_argument("--plot", type=str, default=None)
     args = p.parse_args()
 
     df = pd.read_csv(args.csv)
