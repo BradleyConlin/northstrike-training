@@ -72,7 +72,9 @@ def _valid_numeric(series: pd.Series) -> pd.Series:
     return pd.to_numeric(series, errors="coerce")
 
 
-# ---------- Core KPI function ----------
+# ----------Compute Hover KPIs ----------
+
+
 def compute_hover_kpis(
     data: Optional[pd.DataFrame] = None,
     *,
@@ -84,7 +86,7 @@ def compute_hover_kpis(
     Compute basic hover KPIs from a DataFrame or CSV.
 
     Returns dict with keys:
-      samples, duration_s, alt_mean, alt_std, alt_rmse, max_alt_dev, xy_std, hover_score
+      samples, duration_s, alt_mean, alt_std, alt_rmse, hover_rms_m, max_alt_dev, xy_std, hover_score
     """
     if df is None:
         df = data
@@ -98,6 +100,7 @@ def compute_hover_kpis(
             "alt_mean": float("nan"),
             "alt_std": float("nan"),
             "alt_rmse": None,
+            "hover_rms_m": None,
             "max_alt_dev": None,
             "xy_std": None,
             "hover_score": None,
@@ -142,7 +145,7 @@ def compute_hover_kpis(
     if z_col and df[z_col].notna().any():
         z = df[z_col].dropna().astype(float)
         alt_mean = float(z.mean())
-        alt_std = float(z.std(ddof=0))
+        alt_std = float(z.std(ddof=0))  # std == RMS around the mean
 
         if zsp_col and df[zsp_col].notna().any():
             zsp = df[zsp_col].dropna().astype(float)
@@ -152,7 +155,15 @@ def compute_hover_kpis(
                 alt_rmse = float(np.sqrt(np.mean(err**2)))
                 max_alt_dev = float(np.max(np.abs(err)))
         else:
+            # Without a setpoint, characterize stability around the mean
             max_alt_dev = float(np.max(np.abs(z - z.mean()))) if len(z) else None
+
+    # hover_rms_m is RMSE vs setpoint when available; otherwise RMS around mean (= alt_std)
+    hover_rms_m: Optional[float] = (
+        alt_rmse
+        if alt_rmse is not None
+        else (alt_std if not (isinstance(alt_std, float) and np.isnan(alt_std)) else None)
+    )
 
     xy_std: Optional[float] = None
     if x_col and y_col and df[x_col].notna().any() and df[y_col].notna().any():
@@ -182,6 +193,7 @@ def compute_hover_kpis(
         "alt_mean": alt_mean,
         "alt_std": alt_std,
         "alt_rmse": alt_rmse,
+        "hover_rms_m": hover_rms_m,
         "max_alt_dev": max_alt_dev,
         "xy_std": xy_std,
         "hover_score": hover_score,
