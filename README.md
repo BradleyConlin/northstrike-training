@@ -9,3 +9,5 @@ See `docs/architecture_overview.md` and the per-module READMEs. Fill in code whe
 
 ## Structure
 See the repository tree and `docs/` for details.
+
+![CI](https://github.com/BradleyConlin/northstrike-training/actions/workflows/ci.yml/badge.svg)

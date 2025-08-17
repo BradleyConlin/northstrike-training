@@ -105,3 +105,13 @@ smoke: smoke_hover smoke_mission
 .PHONY: plan_demo
 plan_demo:
 	python3 scripts/tools/gen_demo_plan.py --write-sha
+
+.PHONY: precommit
+precommit:
+	pre-commit run --all-files
+
+.PHONY: test ci_local
+test:
+	python -m pytest -q
+
+ci_local: precommit test
