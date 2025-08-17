@@ -103,6 +103,7 @@ def compute_hover_kpis(
             "hover_rms_m": None,
             "max_alt_dev": None,
             "xy_std": None,
+            "xy_rms_m": 0.0,
             "hover_score": None,
         }
 
@@ -172,6 +173,9 @@ def compute_hover_kpis(
         r = np.sqrt((xs - xs.mean()) ** 2 + (ys - ys.mean()) ** 2)
         xy_std = float(r.std(ddof=0)) if r.size > 0 else None
 
+    # xy_rms_m: RMS horizontal deviation (m); if XY not available, treat as 0.0 (stationary)
+    xy_rms_m: Optional[float] = xy_std if xy_std is not None else 0.0
+
     # Composite score (0..1), higher is better
     def _score(val: Optional[float], good: float, bad: float) -> Optional[float]:
         if val is None or (isinstance(val, float) and math.isnan(val)):
@@ -196,6 +200,7 @@ def compute_hover_kpis(
         "hover_rms_m": hover_rms_m,
         "max_alt_dev": max_alt_dev,
         "xy_std": xy_std,
+        "xy_rms_m": xy_rms_m,
         "hover_score": hover_score,
     }
 
