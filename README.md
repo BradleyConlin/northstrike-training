@@ -1,3 +1,5 @@
+[![CI](https://github.com/BradleyConlin/northstrike-training/actions/workflows/ci.yml/badge.svg)](https://github.com/BradleyConlin/northstrike-training/actions/workflows/ci.yml)
+
 # Northstrike Training & Deployment
 
 This repo contains the full scaffold for simulation → training → evaluation → deployment → observability.
