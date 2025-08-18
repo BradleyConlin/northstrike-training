@@ -13,3 +13,8 @@ See `docs/architecture_overview.md` and the per-module READMEs. Fill in code whe
 See the repository tree and `docs/` for details.
 
 ![CI](https://github.com/BradleyConlin/northstrike-training/actions/workflows/ci.yml/badge.svg)
+
+## Project status
+- **CI:** [![CI](https://github.com/BradleyConlin/northstrike-training/actions/workflows/ci.yml/badge.svg)](https://github.com/BradleyConlin/northstrike-training/actions/workflows/ci.yml)
+- **24-point dashboard:** [reports/24-point-status.md](reports/24-point-status.md)
+- **Waypoint demo:** `python -m scripts.run_waypoint_demo --help`
