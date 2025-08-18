@@ -15,7 +15,11 @@ try:
 except Exception:
     mlflow = None  # optional for --help/import in CI
 import pandas as pd
-from mlflow.tracking import MlflowClient
+
+try:
+    from mlflow.tracking import MlflowClient  # type: ignore
+except Exception:
+    MlflowClient = None  # type: ignore
 
 
 def _set_mlflow() -> None:

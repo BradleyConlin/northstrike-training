@@ -1,0 +1,462 @@
+test	Set up job	﻿2025-08-18T20:45:13.3418241Z Current runner version: '2.327.1'
+test	Set up job	2025-08-18T20:45:13.3452995Z ##[group]Runner Image Provisioner
+test	Set up job	2025-08-18T20:45:13.3454346Z Hosted Compute Agent
+test	Set up job	2025-08-18T20:45:13.3455395Z Version: 20250818.377
+test	Set up job	2025-08-18T20:45:13.3456487Z Commit: 3c593e9f75fe0b87e893bca80d6e12ba089c61fc
+test	Set up job	2025-08-18T20:45:13.3457713Z Build Date: 2025-08-18T14:52:18Z
+test	Set up job	2025-08-18T20:45:13.3458743Z ##[endgroup]
+test	Set up job	2025-08-18T20:45:13.3459604Z ##[group]Operating System
+test	Set up job	2025-08-18T20:45:13.3460877Z Ubuntu
+test	Set up job	2025-08-18T20:45:13.3461660Z 24.04.2
+test	Set up job	2025-08-18T20:45:13.3462448Z LTS
+test	Set up job	2025-08-18T20:45:13.3463286Z ##[endgroup]
+test	Set up job	2025-08-18T20:45:13.3464158Z ##[group]Runner Image
+test	Set up job	2025-08-18T20:45:13.3465124Z Image: ubuntu-24.04
+test	Set up job	2025-08-18T20:45:13.3466267Z Version: 20250810.1.0
+test	Set up job	2025-08-18T20:45:13.3468079Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250810.1/images/ubuntu/Ubuntu2404-Readme.md
+test	Set up job	2025-08-18T20:45:13.3470801Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250810.1
+test	Set up job	2025-08-18T20:45:13.3472817Z ##[endgroup]
+test	Set up job	2025-08-18T20:45:13.3474915Z ##[group]GITHUB_TOKEN Permissions
+test	Set up job	2025-08-18T20:45:13.3477805Z Contents: read
+test	Set up job	2025-08-18T20:45:13.3478880Z Metadata: read
+test	Set up job	2025-08-18T20:45:13.3479715Z Packages: read
+test	Set up job	2025-08-18T20:45:13.3480771Z ##[endgroup]
+test	Set up job	2025-08-18T20:45:13.3483677Z Secret source: Actions
+test	Set up job	2025-08-18T20:45:13.3484759Z Prepare workflow directory
+test	Set up job	2025-08-18T20:45:13.3954711Z Prepare all required actions
+test	Set up job	2025-08-18T20:45:13.4011846Z Getting action download info
+test	Set up job	2025-08-18T20:45:13.6207257Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+test	Set up job	2025-08-18T20:45:13.8912048Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+test	Set up job	2025-08-18T20:45:14.2578702Z Complete job name: test
+test	Run actions/checkout@v4	﻿2025-08-18T20:45:14.3473664Z ##[group]Run actions/checkout@v4
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3475011Z with:
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3475923Z   repository: BradleyConlin/northstrike-training
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3477356Z   token: ***
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3478271Z   ssh-strict: true
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3479172Z   ssh-user: git
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3480012Z   persist-credentials: true
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3481152Z   clean: true
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3481971Z   sparse-checkout-cone-mode: true
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3482962Z   fetch-depth: 1
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3483748Z   fetch-tags: false
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3484552Z   show-progress: true
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3485365Z   lfs: false
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3486103Z   submodules: false
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3486951Z   set-safe-directory: true
+test	Run actions/checkout@v4	2025-08-18T20:45:14.3488137Z ##[endgroup]
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4646990Z Syncing repository: BradleyConlin/northstrike-training
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4651229Z ##[group]Getting Git version info
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4653776Z Working directory is '/home/runner/work/northstrike-training/northstrike-training'
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4656403Z [command]/usr/bin/git version
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4666318Z git version 2.50.1
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4691291Z ##[endgroup]
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4704539Z Temporarily overriding HOME='/home/runner/work/_temp/721b6770-d231-4a7d-a7b8-9df3124dad05' before making global git config changes
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4707507Z Adding repository directory to the temporary git global config as a safe directory
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4710485Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/northstrike-training/northstrike-training
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4741390Z Deleting the contents of '/home/runner/work/northstrike-training/northstrike-training'
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4744033Z ##[group]Initializing the repository
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4748152Z [command]/usr/bin/git init /home/runner/work/northstrike-training/northstrike-training
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4801373Z hint: Using 'master' as the name for the initial branch. This default branch name
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4804665Z hint: is subject to change. To configure the initial branch name to use in all
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4807751Z hint: of your new repositories, which will suppress this warning, call:
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4809931Z hint:
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4811367Z hint: 	git config --global init.defaultBranch <name>
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4813199Z hint:
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4814303Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4816077Z hint: 'development'. The just-created branch can be renamed via this command:
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4817459Z hint:
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4818322Z hint: 	git branch -m <name>
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4819817Z hint:
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4822010Z hint: Disable this message with "git config set advice.defaultBranchName false"
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4825802Z Initialized empty Git repository in /home/runner/work/northstrike-training/northstrike-training/.git/
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4829408Z [command]/usr/bin/git remote add origin https://github.com/BradleyConlin/northstrike-training
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4852734Z ##[endgroup]
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4855182Z ##[group]Disabling automatic garbage collection
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4857401Z [command]/usr/bin/git config --local gc.auto 0
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4885644Z ##[endgroup]
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4887974Z ##[group]Setting up auth
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4893156Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Run actions/checkout@v4	2025-08-18T20:45:14.4924707Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Run actions/checkout@v4	2025-08-18T20:45:14.5170168Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Run actions/checkout@v4	2025-08-18T20:45:14.5198851Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Run actions/checkout@v4	2025-08-18T20:45:14.5412800Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+test	Run actions/checkout@v4	2025-08-18T20:45:14.5447174Z ##[endgroup]
+test	Run actions/checkout@v4	2025-08-18T20:45:14.5448496Z ##[group]Fetching the repository
+test	Run actions/checkout@v4	2025-08-18T20:45:14.5456771Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +86352b4f0fbf681162ac99e4e725e80673d41980:refs/remotes/pull/13/merge
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7515508Z From https://github.com/BradleyConlin/northstrike-training
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7519001Z  * [new ref]         86352b4f0fbf681162ac99e4e725e80673d41980 -> pull/13/merge
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7539642Z ##[endgroup]
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7541334Z ##[group]Determining the checkout info
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7542837Z ##[endgroup]
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7548074Z [command]/usr/bin/git sparse-checkout disable
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7587417Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7615432Z ##[group]Checking out the ref
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7618269Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/13/merge
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7714062Z Note: switching to 'refs/remotes/pull/13/merge'.
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7715143Z 
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7716108Z You are in 'detached HEAD' state. You can look around, make experimental
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7719052Z changes and commit them, and you can discard any commits you make in this
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7722189Z state without impacting any branches by switching back to a branch.
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7723920Z 
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7725006Z If you want to create a new branch to retain commits you create, you may
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7727684Z do so (now or later) by using -c with the switch command. Example:
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7729203Z 
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7729791Z   git switch -c <new-branch-name>
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7731003Z 
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7731559Z Or undo this operation with:
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7732353Z 
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7732677Z   git switch -
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7733123Z 
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7733885Z Turn off this advice by setting config variable advice.detachedHead to false
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7734952Z 
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7736160Z HEAD is now at 86352b4 Merge ee0cf23344f47d974077b26bfcec2aeb3236a422 into 42a0b1f03fe40c0c272c8893be2bb93ac6e0ff3c
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7741233Z ##[endgroup]
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7757652Z [command]/usr/bin/git log -1 --format=%H
+test	Run actions/checkout@v4	2025-08-18T20:45:14.7778863Z 86352b4f0fbf681162ac99e4e725e80673d41980
+test	Run actions/setup-python@v5	﻿2025-08-18T20:45:14.8060531Z ##[group]Run actions/setup-python@v5
+test	Run actions/setup-python@v5	2025-08-18T20:45:14.8061508Z with:
+test	Run actions/setup-python@v5	2025-08-18T20:45:14.8062180Z   python-version: 3.10
+test	Run actions/setup-python@v5	2025-08-18T20:45:14.8062963Z   check-latest: false
+test	Run actions/setup-python@v5	2025-08-18T20:45:14.8063938Z   token: ***
+test	Run actions/setup-python@v5	2025-08-18T20:45:14.8064646Z   update-environment: true
+test	Run actions/setup-python@v5	2025-08-18T20:45:14.8065497Z   allow-prereleases: false
+test	Run actions/setup-python@v5	2025-08-18T20:45:14.8066311Z   freethreaded: false
+test	Run actions/setup-python@v5	2025-08-18T20:45:14.8067051Z ##[endgroup]
+test	Run actions/setup-python@v5	2025-08-18T20:45:14.9683654Z ##[group]Installed versions
+test	Run actions/setup-python@v5	2025-08-18T20:45:14.9776894Z Successfully set up CPython (3.10.18)
+test	Run actions/setup-python@v5	2025-08-18T20:45:14.9778705Z ##[endgroup]
+test	Install deps	﻿2025-08-18T20:45:14.9922474Z ##[group]Run python -m pip install -U pip
+test	Install deps	2025-08-18T20:45:14.9923645Z [36;1mpython -m pip install -U pip[0m
+test	Install deps	2025-08-18T20:45:14.9924696Z [36;1mif [ -f requirements-dev.txt ]; then[0m
+test	Install deps	2025-08-18T20:45:14.9925790Z [36;1m  pip install -r requirements-dev.txt[0m
+test	Install deps	2025-08-18T20:45:14.9926772Z [36;1melse[0m
+test	Install deps	2025-08-18T20:45:14.9927610Z [36;1m  pip install pytest numpy==1.26.4 pandas==2.2.2[0m
+test	Install deps	2025-08-18T20:45:14.9928659Z [36;1mfi[0m
+test	Install deps	2025-08-18T20:45:15.0153633Z shell: /usr/bin/bash -e {0}
+test	Install deps	2025-08-18T20:45:15.0154480Z env:
+test	Install deps	2025-08-18T20:45:15.0155336Z   pythonLocation: /opt/hostedtoolcache/Python/3.10.18/x64
+test	Install deps	2025-08-18T20:45:15.0156797Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.10.18/x64/lib/pkgconfig
+test	Install deps	2025-08-18T20:45:15.0158232Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.18/x64
+test	Install deps	2025-08-18T20:45:15.0159531Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.18/x64
+test	Install deps	2025-08-18T20:45:15.0161008Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.18/x64
+test	Install deps	2025-08-18T20:45:15.0162335Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.10.18/x64/lib
+test	Install deps	2025-08-18T20:45:15.0163469Z ##[endgroup]
+test	Install deps	2025-08-18T20:45:17.2070633Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages (25.2)
+test	Install deps	2025-08-18T20:45:17.9227589Z Collecting black (from -r requirements-dev.txt (line 1))
+test	Install deps	2025-08-18T20:45:17.9658880Z   Downloading black-25.1.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl.metadata (81 kB)
+test	Install deps	2025-08-18T20:45:18.0326129Z Collecting isort (from -r requirements-dev.txt (line 2))
+test	Install deps	2025-08-18T20:45:18.0398817Z   Downloading isort-6.0.1-py3-none-any.whl.metadata (11 kB)
+test	Install deps	2025-08-18T20:45:18.0696388Z Collecting flake8 (from -r requirements-dev.txt (line 3))
+test	Install deps	2025-08-18T20:45:18.0768505Z   Downloading flake8-7.3.0-py2.py3-none-any.whl.metadata (3.8 kB)
+test	Install deps	2025-08-18T20:45:18.1235224Z Collecting pytest (from -r requirements-dev.txt (line 4))
+test	Install deps	2025-08-18T20:45:18.1305678Z   Downloading pytest-8.4.1-py3-none-any.whl.metadata (7.7 kB)
+test	Install deps	2025-08-18T20:45:18.1805776Z Collecting pre-commit (from -r requirements-dev.txt (line 5))
+test	Install deps	2025-08-18T20:45:18.1878918Z   Downloading pre_commit-4.3.0-py2.py3-none-any.whl.metadata (1.2 kB)
+test	Install deps	2025-08-18T20:45:18.4101952Z Collecting numpy==1.26.4 (from -r requirements-dev.txt (line 7))
+test	Install deps	2025-08-18T20:45:18.4175438Z   Downloading numpy-1.26.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+test	Install deps	2025-08-18T20:45:18.5567012Z Collecting pandas==2.2.2 (from -r requirements-dev.txt (line 8))
+test	Install deps	2025-08-18T20:45:18.5642575Z   Downloading pandas-2.2.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (19 kB)
+test	Install deps	2025-08-18T20:45:18.6172467Z Collecting pytest-cov (from -r requirements-dev.txt (line 9))
+test	Install deps	2025-08-18T20:45:18.6244137Z   Downloading pytest_cov-6.2.1-py3-none-any.whl.metadata (30 kB)
+test	Install deps	2025-08-18T20:45:18.6498005Z Collecting python-dateutil>=2.8.2 (from pandas==2.2.2->-r requirements-dev.txt (line 8))
+test	Install deps	2025-08-18T20:45:18.6567692Z   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+test	Install deps	2025-08-18T20:45:18.7174543Z Collecting pytz>=2020.1 (from pandas==2.2.2->-r requirements-dev.txt (line 8))
+test	Install deps	2025-08-18T20:45:18.7248351Z   Downloading pytz-2025.2-py2.py3-none-any.whl.metadata (22 kB)
+test	Install deps	2025-08-18T20:45:18.7437337Z Collecting tzdata>=2022.7 (from pandas==2.2.2->-r requirements-dev.txt (line 8))
+test	Install deps	2025-08-18T20:45:18.7508679Z   Downloading tzdata-2025.2-py2.py3-none-any.whl.metadata (1.4 kB)
+test	Install deps	2025-08-18T20:45:18.7733347Z Collecting click>=8.0.0 (from black->-r requirements-dev.txt (line 1))
+test	Install deps	2025-08-18T20:45:18.7802659Z   Downloading click-8.2.1-py3-none-any.whl.metadata (2.5 kB)
+test	Install deps	2025-08-18T20:45:18.7939645Z Collecting mypy-extensions>=0.4.3 (from black->-r requirements-dev.txt (line 1))
+test	Install deps	2025-08-18T20:45:18.8015358Z   Downloading mypy_extensions-1.1.0-py3-none-any.whl.metadata (1.1 kB)
+test	Install deps	2025-08-18T20:45:18.8257482Z Collecting packaging>=22.0 (from black->-r requirements-dev.txt (line 1))
+test	Install deps	2025-08-18T20:45:18.8336624Z   Downloading packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
+test	Install deps	2025-08-18T20:45:18.8514768Z Collecting pathspec>=0.9.0 (from black->-r requirements-dev.txt (line 1))
+test	Install deps	2025-08-18T20:45:18.8593579Z   Downloading pathspec-0.12.1-py3-none-any.whl.metadata (21 kB)
+test	Install deps	2025-08-18T20:45:18.8929030Z Collecting platformdirs>=2 (from black->-r requirements-dev.txt (line 1))
+test	Install deps	2025-08-18T20:45:18.9006024Z   Downloading platformdirs-4.3.8-py3-none-any.whl.metadata (12 kB)
+test	Install deps	2025-08-18T20:45:18.9222351Z Collecting tomli>=1.1.0 (from black->-r requirements-dev.txt (line 1))
+test	Install deps	2025-08-18T20:45:18.9292719Z   Downloading tomli-2.2.1-py3-none-any.whl.metadata (10 kB)
+test	Install deps	2025-08-18T20:45:18.9524927Z Collecting typing-extensions>=4.0.1 (from black->-r requirements-dev.txt (line 1))
+test	Install deps	2025-08-18T20:45:18.9600729Z   Downloading typing_extensions-4.14.1-py3-none-any.whl.metadata (3.0 kB)
+test	Install deps	2025-08-18T20:45:18.9749593Z Collecting mccabe<0.8.0,>=0.7.0 (from flake8->-r requirements-dev.txt (line 3))
+test	Install deps	2025-08-18T20:45:18.9843073Z   Downloading mccabe-0.7.0-py2.py3-none-any.whl.metadata (5.0 kB)
+test	Install deps	2025-08-18T20:45:19.0002724Z Collecting pycodestyle<2.15.0,>=2.14.0 (from flake8->-r requirements-dev.txt (line 3))
+test	Install deps	2025-08-18T20:45:19.0083516Z   Downloading pycodestyle-2.14.0-py2.py3-none-any.whl.metadata (4.5 kB)
+test	Install deps	2025-08-18T20:45:19.0272913Z Collecting pyflakes<3.5.0,>=3.4.0 (from flake8->-r requirements-dev.txt (line 3))
+test	Install deps	2025-08-18T20:45:19.0355605Z   Downloading pyflakes-3.4.0-py2.py3-none-any.whl.metadata (3.5 kB)
+test	Install deps	2025-08-18T20:45:19.0547981Z Collecting exceptiongroup>=1 (from pytest->-r requirements-dev.txt (line 4))
+test	Install deps	2025-08-18T20:45:19.0621870Z   Downloading exceptiongroup-1.3.0-py3-none-any.whl.metadata (6.7 kB)
+test	Install deps	2025-08-18T20:45:19.0771555Z Collecting iniconfig>=1 (from pytest->-r requirements-dev.txt (line 4))
+test	Install deps	2025-08-18T20:45:19.0845074Z   Downloading iniconfig-2.1.0-py3-none-any.whl.metadata (2.7 kB)
+test	Install deps	2025-08-18T20:45:19.1058381Z Collecting pluggy<2,>=1.5 (from pytest->-r requirements-dev.txt (line 4))
+test	Install deps	2025-08-18T20:45:19.1134769Z   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+test	Install deps	2025-08-18T20:45:19.1392368Z Collecting pygments>=2.7.2 (from pytest->-r requirements-dev.txt (line 4))
+test	Install deps	2025-08-18T20:45:19.1478410Z   Downloading pygments-2.19.2-py3-none-any.whl.metadata (2.5 kB)
+test	Install deps	2025-08-18T20:45:19.1683855Z Collecting cfgv>=2.0.0 (from pre-commit->-r requirements-dev.txt (line 5))
+test	Install deps	2025-08-18T20:45:19.1757827Z   Downloading cfgv-3.4.0-py2.py3-none-any.whl.metadata (8.5 kB)
+test	Install deps	2025-08-18T20:45:19.2305733Z Collecting identify>=1.0.0 (from pre-commit->-r requirements-dev.txt (line 5))
+test	Install deps	2025-08-18T20:45:19.2381389Z   Downloading identify-2.6.13-py2.py3-none-any.whl.metadata (4.4 kB)
+test	Install deps	2025-08-18T20:45:19.2583673Z Collecting nodeenv>=0.11.1 (from pre-commit->-r requirements-dev.txt (line 5))
+test	Install deps	2025-08-18T20:45:19.2660650Z   Downloading nodeenv-1.9.1-py2.py3-none-any.whl.metadata (21 kB)
+test	Install deps	2025-08-18T20:45:19.3132213Z Collecting pyyaml>=5.1 (from pre-commit->-r requirements-dev.txt (line 5))
+test	Install deps	2025-08-18T20:45:19.3212750Z   Downloading PyYAML-6.0.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+test	Install deps	2025-08-18T20:45:19.3748203Z Collecting virtualenv>=20.10.0 (from pre-commit->-r requirements-dev.txt (line 5))
+test	Install deps	2025-08-18T20:45:19.3820490Z   Downloading virtualenv-20.34.0-py3-none-any.whl.metadata (4.6 kB)
+test	Install deps	2025-08-18T20:45:19.8217006Z Collecting coverage>=7.5 (from coverage[toml]>=7.5->pytest-cov->-r requirements-dev.txt (line 9))
+test	Install deps	2025-08-18T20:45:19.8292728Z   Downloading coverage-7.10.4-cp310-cp310-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (8.9 kB)
+test	Install deps	2025-08-18T20:45:19.8701028Z Collecting six>=1.5 (from python-dateutil>=2.8.2->pandas==2.2.2->-r requirements-dev.txt (line 8))
+test	Install deps	2025-08-18T20:45:19.8772334Z   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+test	Install deps	2025-08-18T20:45:19.9025189Z Collecting distlib<1,>=0.3.7 (from virtualenv>=20.10.0->pre-commit->-r requirements-dev.txt (line 5))
+test	Install deps	2025-08-18T20:45:19.9095988Z   Downloading distlib-0.4.0-py2.py3-none-any.whl.metadata (5.2 kB)
+test	Install deps	2025-08-18T20:45:19.9344929Z Collecting filelock<4,>=3.12.2 (from virtualenv>=20.10.0->pre-commit->-r requirements-dev.txt (line 5))
+test	Install deps	2025-08-18T20:45:19.9417502Z   Downloading filelock-3.19.1-py3-none-any.whl.metadata (2.1 kB)
+test	Install deps	2025-08-18T20:45:19.9664237Z Downloading numpy-1.26.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.2 MB)
+test	Install deps	2025-08-18T20:45:20.0529994Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 18.2/18.2 MB 231.3 MB/s  0:00:00
+test	Install deps	2025-08-18T20:45:20.0608947Z Downloading pandas-2.2.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (13.0 MB)
+test	Install deps	2025-08-18T20:45:20.1115065Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.0/13.0 MB 267.1 MB/s  0:00:00
+test	Install deps	2025-08-18T20:45:20.1190652Z Downloading black-25.1.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl (1.8 MB)
+test	Install deps	2025-08-18T20:45:20.1293113Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 191.5 MB/s  0:00:00
+test	Install deps	2025-08-18T20:45:20.1363085Z Downloading isort-6.0.1-py3-none-any.whl (94 kB)
+test	Install deps	2025-08-18T20:45:20.1456841Z Downloading flake8-7.3.0-py2.py3-none-any.whl (57 kB)
+test	Install deps	2025-08-18T20:45:20.1549707Z Downloading mccabe-0.7.0-py2.py3-none-any.whl (7.3 kB)
+test	Install deps	2025-08-18T20:45:20.1640401Z Downloading pycodestyle-2.14.0-py2.py3-none-any.whl (31 kB)
+test	Install deps	2025-08-18T20:45:20.1728659Z Downloading pyflakes-3.4.0-py2.py3-none-any.whl (63 kB)
+test	Install deps	2025-08-18T20:45:20.1822162Z Downloading pytest-8.4.1-py3-none-any.whl (365 kB)
+test	Install deps	2025-08-18T20:45:20.1929294Z Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+test	Install deps	2025-08-18T20:45:20.2018101Z Downloading pre_commit-4.3.0-py2.py3-none-any.whl (220 kB)
+test	Install deps	2025-08-18T20:45:20.2113305Z Downloading pytest_cov-6.2.1-py3-none-any.whl (24 kB)
+test	Install deps	2025-08-18T20:45:20.2202002Z Downloading cfgv-3.4.0-py2.py3-none-any.whl (7.2 kB)
+test	Install deps	2025-08-18T20:45:20.2289430Z Downloading click-8.2.1-py3-none-any.whl (102 kB)
+test	Install deps	2025-08-18T20:45:20.2383083Z Downloading coverage-7.10.4-cp310-cp310-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (245 kB)
+test	Install deps	2025-08-18T20:45:20.2477882Z Downloading exceptiongroup-1.3.0-py3-none-any.whl (16 kB)
+test	Install deps	2025-08-18T20:45:20.2574266Z Downloading identify-2.6.13-py2.py3-none-any.whl (99 kB)
+test	Install deps	2025-08-18T20:45:20.2669428Z Downloading iniconfig-2.1.0-py3-none-any.whl (6.0 kB)
+test	Install deps	2025-08-18T20:45:20.2760667Z Downloading mypy_extensions-1.1.0-py3-none-any.whl (5.0 kB)
+test	Install deps	2025-08-18T20:45:20.2848770Z Downloading nodeenv-1.9.1-py2.py3-none-any.whl (22 kB)
+test	Install deps	2025-08-18T20:45:20.2943946Z Downloading packaging-25.0-py3-none-any.whl (66 kB)
+test	Install deps	2025-08-18T20:45:20.3043027Z Downloading pathspec-0.12.1-py3-none-any.whl (31 kB)
+test	Install deps	2025-08-18T20:45:20.3136806Z Downloading platformdirs-4.3.8-py3-none-any.whl (18 kB)
+test	Install deps	2025-08-18T20:45:20.3225174Z Downloading pygments-2.19.2-py3-none-any.whl (1.2 MB)
+test	Install deps	2025-08-18T20:45:20.3305627Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 168.4 MB/s  0:00:00
+test	Install deps	2025-08-18T20:45:20.3379061Z Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+test	Install deps	2025-08-18T20:45:20.3476507Z Downloading pytz-2025.2-py2.py3-none-any.whl (509 kB)
+test	Install deps	2025-08-18T20:45:20.3636644Z Downloading PyYAML-6.0.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (751 kB)
+test	Install deps	2025-08-18T20:45:20.3701253Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 751.2/751.2 kB 119.6 MB/s  0:00:00
+test	Install deps	2025-08-18T20:45:20.3770891Z Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+test	Install deps	2025-08-18T20:45:20.3861494Z Downloading tomli-2.2.1-py3-none-any.whl (14 kB)
+test	Install deps	2025-08-18T20:45:20.3950448Z Downloading typing_extensions-4.14.1-py3-none-any.whl (43 kB)
+test	Install deps	2025-08-18T20:45:20.4041292Z Downloading tzdata-2025.2-py2.py3-none-any.whl (347 kB)
+test	Install deps	2025-08-18T20:45:20.4170546Z Downloading virtualenv-20.34.0-py3-none-any.whl (6.0 MB)
+test	Install deps	2025-08-18T20:45:20.4557118Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.0/6.0 MB 158.6 MB/s  0:00:00
+test	Install deps	2025-08-18T20:45:20.4631323Z Downloading distlib-0.4.0-py2.py3-none-any.whl (469 kB)
+test	Install deps	2025-08-18T20:45:20.4753364Z Downloading filelock-3.19.1-py3-none-any.whl (15 kB)
+test	Install deps	2025-08-18T20:45:20.6650429Z Installing collected packages: pytz, distlib, tzdata, typing-extensions, tomli, six, pyyaml, pygments, pyflakes, pycodestyle, pluggy, platformdirs, pathspec, packaging, numpy, nodeenv, mypy-extensions, mccabe, isort, iniconfig, identify, filelock, coverage, click, cfgv, virtualenv, python-dateutil, flake8, exceptiongroup, black, pytest, pre-commit, pandas, pytest-cov
+test	Install deps	2025-08-18T20:45:28.1549386Z 
+test	Install deps	2025-08-18T20:45:28.1608318Z Successfully installed black-25.1.0 cfgv-3.4.0 click-8.2.1 coverage-7.10.4 distlib-0.4.0 exceptiongroup-1.3.0 filelock-3.19.1 flake8-7.3.0 identify-2.6.13 iniconfig-2.1.0 isort-6.0.1 mccabe-0.7.0 mypy-extensions-1.1.0 nodeenv-1.9.1 numpy-1.26.4 packaging-25.0 pandas-2.2.2 pathspec-0.12.1 platformdirs-4.3.8 pluggy-1.6.0 pre-commit-4.3.0 pycodestyle-2.14.0 pyflakes-3.4.0 pygments-2.19.2 pytest-8.4.1 pytest-cov-6.2.1 python-dateutil-2.9.0.post0 pytz-2025.2 pyyaml-6.0.2 six-1.17.0 tomli-2.2.1 typing-extensions-4.14.1 tzdata-2025.2 virtualenv-20.34.0
+test	Run tests	﻿2025-08-18T20:45:28.2904768Z ##[group]Run pytest -q
+test	Run tests	2025-08-18T20:45:28.2905041Z [36;1mpytest -q[0m
+test	Run tests	2025-08-18T20:45:28.2947947Z shell: /usr/bin/bash -e {0}
+test	Run tests	2025-08-18T20:45:28.2948175Z env:
+test	Run tests	2025-08-18T20:45:28.2948422Z   pythonLocation: /opt/hostedtoolcache/Python/3.10.18/x64
+test	Run tests	2025-08-18T20:45:28.2948828Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.10.18/x64/lib/pkgconfig
+test	Run tests	2025-08-18T20:45:28.2949236Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.18/x64
+test	Run tests	2025-08-18T20:45:28.2949579Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.18/x64
+test	Run tests	2025-08-18T20:45:28.2949913Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.18/x64
+test	Run tests	2025-08-18T20:45:28.2950476Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.10.18/x64/lib
+test	Run tests	2025-08-18T20:45:28.2950751Z ##[endgroup]
+test	Run tests	2025-08-18T20:45:29.8029039Z .....FF....FF......                                                      [100%]
+test	Run tests	2025-08-18T20:45:29.8029863Z =================================== FAILURES ===================================
+test	Run tests	2025-08-18T20:45:29.8030643Z ______________ test_imports[scripts.evaluation.log_dummy_metrics] ______________
+test	Run tests	2025-08-18T20:45:29.8031165Z 
+test	Run tests	2025-08-18T20:45:29.8031330Z mod = 'scripts.evaluation.log_dummy_metrics'
+test	Run tests	2025-08-18T20:45:29.8031612Z 
+test	Run tests	2025-08-18T20:45:29.8031773Z     @pytest.mark.parametrize("mod", SCRIPTS)
+test	Run tests	2025-08-18T20:45:29.8032154Z     def test_imports(mod):
+test	Run tests	2025-08-18T20:45:29.8032512Z >       importlib.import_module(mod)
+test	Run tests	2025-08-18T20:45:29.8032772Z 
+test	Run tests	2025-08-18T20:45:29.8032905Z tests/test_cli_smoke.py:19: 
+test	Run tests	2025-08-18T20:45:29.8033213Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test	Run tests	2025-08-18T20:45:29.8033679Z /opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/importlib/__init__.py:126: in import_module
+test	Run tests	2025-08-18T20:45:29.8034172Z     return _bootstrap._gcd_import(name[level:], package, level)
+test	Run tests	2025-08-18T20:45:29.8034518Z <frozen importlib._bootstrap>:1050: in _gcd_import
+test	Run tests	2025-08-18T20:45:29.8034772Z     ???
+test	Run tests	2025-08-18T20:45:29.8034975Z <frozen importlib._bootstrap>:1027: in _find_and_load
+test	Run tests	2025-08-18T20:45:29.8035234Z     ???
+test	Run tests	2025-08-18T20:45:29.8035453Z <frozen importlib._bootstrap>:1006: in _find_and_load_unlocked
+test	Run tests	2025-08-18T20:45:29.8035732Z     ???
+test	Run tests	2025-08-18T20:45:29.8035919Z <frozen importlib._bootstrap>:688: in _load_unlocked
+test	Run tests	2025-08-18T20:45:29.8036170Z     ???
+test	Run tests	2025-08-18T20:45:29.8036379Z <frozen importlib._bootstrap_external>:883: in exec_module
+test	Run tests	2025-08-18T20:45:29.8036886Z     ???
+test	Run tests	2025-08-18T20:45:29.8037116Z <frozen importlib._bootstrap>:241: in _call_with_frames_removed
+test	Run tests	2025-08-18T20:45:29.8037392Z     ???
+test	Run tests	2025-08-18T20:45:29.8037578Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test	Run tests	2025-08-18T20:45:29.8037764Z 
+test	Run tests	2025-08-18T20:45:29.8037843Z     #!/usr/bin/env python3
+test	Run tests	2025-08-18T20:45:29.8038041Z     import random
+test	Run tests	2025-08-18T20:45:29.8038207Z     
+test	Run tests	2025-08-18T20:45:29.8038345Z     try:
+test	Run tests	2025-08-18T20:45:29.8038500Z         import mlflow
+test	Run tests	2025-08-18T20:45:29.8038680Z     except Exception:
+test	Run tests	2025-08-18T20:45:29.8038913Z         mlflow = None  # optional for --help/import in CI
+test	Run tests	2025-08-18T20:45:29.8039263Z >   mlflow.set_tracking_uri("http://127.0.0.1:5000")
+test	Run tests	2025-08-18T20:45:29.8039632Z E   AttributeError: 'NoneType' object has no attribute 'set_tracking_uri'
+test	Run tests	2025-08-18T20:45:29.8039887Z 
+test	Run tests	2025-08-18T20:45:29.8040215Z scripts/evaluation/log_dummy_metrics.py:8: AttributeError
+test	Run tests	2025-08-18T20:45:29.8040673Z _____________ test_imports[scripts.evaluation.waypoint_kpi_report] _____________
+test	Run tests	2025-08-18T20:45:29.8040939Z 
+test	Run tests	2025-08-18T20:45:29.8041054Z mod = 'scripts.evaluation.waypoint_kpi_report'
+test	Run tests	2025-08-18T20:45:29.8041236Z 
+test	Run tests	2025-08-18T20:45:29.8041337Z     @pytest.mark.parametrize("mod", SCRIPTS)
+test	Run tests	2025-08-18T20:45:29.8041588Z     def test_imports(mod):
+test	Run tests	2025-08-18T20:45:29.8041796Z >       importlib.import_module(mod)
+test	Run tests	2025-08-18T20:45:29.8041956Z 
+test	Run tests	2025-08-18T20:45:29.8042035Z tests/test_cli_smoke.py:19: 
+test	Run tests	2025-08-18T20:45:29.8042264Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test	Run tests	2025-08-18T20:45:29.8042711Z /opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/importlib/__init__.py:126: in import_module
+test	Run tests	2025-08-18T20:45:29.8043388Z     return _bootstrap._gcd_import(name[level:], package, level)
+test	Run tests	2025-08-18T20:45:29.8043710Z <frozen importlib._bootstrap>:1050: in _gcd_import
+test	Run tests	2025-08-18T20:45:29.8043954Z     ???
+test	Run tests	2025-08-18T20:45:29.8044145Z <frozen importlib._bootstrap>:1027: in _find_and_load
+test	Run tests	2025-08-18T20:45:29.8044396Z     ???
+test	Run tests	2025-08-18T20:45:29.8044609Z <frozen importlib._bootstrap>:1006: in _find_and_load_unlocked
+test	Run tests	2025-08-18T20:45:29.8044891Z     ???
+test	Run tests	2025-08-18T20:45:29.8045078Z <frozen importlib._bootstrap>:688: in _load_unlocked
+test	Run tests	2025-08-18T20:45:29.8045316Z     ???
+test	Run tests	2025-08-18T20:45:29.8045522Z <frozen importlib._bootstrap_external>:883: in exec_module
+test	Run tests	2025-08-18T20:45:29.8045817Z     ???
+test	Run tests	2025-08-18T20:45:29.8046035Z <frozen importlib._bootstrap>:241: in _call_with_frames_removed
+test	Run tests	2025-08-18T20:45:29.8046307Z     ???
+test	Run tests	2025-08-18T20:45:29.8046490Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test	Run tests	2025-08-18T20:45:29.8046674Z 
+test	Run tests	2025-08-18T20:45:29.8046754Z     #!/usr/bin/env python3
+test	Run tests	2025-08-18T20:45:29.8046966Z     from __future__ import annotations
+test	Run tests	2025-08-18T20:45:29.8047185Z     
+test	Run tests	2025-08-18T20:45:29.8047332Z     import argparse
+test	Run tests	2025-08-18T20:45:29.8047521Z     import datetime as dt
+test	Run tests	2025-08-18T20:45:29.8047708Z     import json
+test	Run tests	2025-08-18T20:45:29.8047876Z     import math
+test	Run tests	2025-08-18T20:45:29.8048037Z     import os
+test	Run tests	2025-08-18T20:45:29.8048210Z     import subprocess
+test	Run tests	2025-08-18T20:45:29.8048436Z     from pathlib import Path
+test	Run tests	2025-08-18T20:45:29.8048742Z     from typing import List, Tuple
+test	Run tests	2025-08-18T20:45:29.8048959Z     
+test	Run tests	2025-08-18T20:45:29.8049097Z     try:
+test	Run tests	2025-08-18T20:45:29.8049252Z         import mlflow
+test	Run tests	2025-08-18T20:45:29.8049431Z     except Exception:
+test	Run tests	2025-08-18T20:45:29.8049655Z         mlflow = None  # optional for --help/import in CI
+test	Run tests	2025-08-18T20:45:29.8049921Z     import pandas as pd
+test	Run tests	2025-08-18T20:45:29.8050426Z >   from mlflow.tracking import MlflowClient
+test	Run tests	2025-08-18T20:45:29.8050716Z E   ModuleNotFoundError: No module named 'mlflow'
+test	Run tests	2025-08-18T20:45:29.8050910Z 
+test	Run tests	2025-08-18T20:45:29.8051077Z scripts/evaluation/waypoint_kpi_report.py:18: ModuleNotFoundError
+test	Run tests	2025-08-18T20:45:29.8051498Z _____________ test_help_runs[scripts.evaluation.log_dummy_metrics] _____________
+test	Run tests	2025-08-18T20:45:29.8051750Z 
+test	Run tests	2025-08-18T20:45:29.8051848Z mod = 'scripts.evaluation.log_dummy_metrics'
+test	Run tests	2025-08-18T20:45:29.8052337Z monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f04daa3e1a0>
+test	Run tests	2025-08-18T20:45:29.8052595Z 
+test	Run tests	2025-08-18T20:45:29.8052696Z     @pytest.mark.parametrize("mod", SCRIPTS)
+test	Run tests	2025-08-18T20:45:29.8052968Z     def test_help_runs(mod, monkeypatch):
+test	Run tests	2025-08-18T20:45:29.8053301Z         # Run the module as a script with --help; argparse should exit cleanly.
+test	Run tests	2025-08-18T20:45:29.8053702Z         monkeypatch.setattr(sys, "argv", [mod.rsplit(".", 1)[-1], "--help"])
+test	Run tests	2025-08-18T20:45:29.8054033Z         with pytest.raises(SystemExit):
+test	Run tests	2025-08-18T20:45:29.8054289Z >           runpy.run_module(mod, run_name="__main__")
+test	Run tests	2025-08-18T20:45:29.8054474Z 
+test	Run tests	2025-08-18T20:45:29.8054558Z tests/test_cli_smoke.py:27: 
+test	Run tests	2025-08-18T20:45:29.8054795Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test	Run tests	2025-08-18T20:45:29.8055189Z /opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/runpy.py:227: in run_module
+test	Run tests	2025-08-18T20:45:29.8055613Z     return _run_code(code, {}, init_globals, run_name, mod_spec)
+test	Run tests	2025-08-18T20:45:29.8056022Z /opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/runpy.py:86: in _run_code
+test	Run tests	2025-08-18T20:45:29.8056371Z     exec(code, run_globals)
+test	Run tests	2025-08-18T20:45:29.8056592Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test	Run tests	2025-08-18T20:45:29.8056781Z 
+test	Run tests	2025-08-18T20:45:29.8056855Z     #!/usr/bin/env python3
+test	Run tests	2025-08-18T20:45:29.8057044Z     import random
+test	Run tests	2025-08-18T20:45:29.8057207Z     
+test	Run tests	2025-08-18T20:45:29.8057352Z     try:
+test	Run tests	2025-08-18T20:45:29.8057501Z         import mlflow
+test	Run tests	2025-08-18T20:45:29.8057683Z     except Exception:
+test	Run tests	2025-08-18T20:45:29.8057902Z         mlflow = None  # optional for --help/import in CI
+test	Run tests	2025-08-18T20:45:29.8058343Z >   mlflow.set_tracking_uri("http://127.0.0.1:5000")
+test	Run tests	2025-08-18T20:45:29.8058711Z E   AttributeError: 'NoneType' object has no attribute 'set_tracking_uri'
+test	Run tests	2025-08-18T20:45:29.8058968Z 
+test	Run tests	2025-08-18T20:45:29.8059103Z scripts/evaluation/log_dummy_metrics.py:8: AttributeError
+test	Run tests	2025-08-18T20:45:29.8059490Z ____________ test_help_runs[scripts.evaluation.waypoint_kpi_report] ____________
+test	Run tests	2025-08-18T20:45:29.8059746Z 
+test	Run tests	2025-08-18T20:45:29.8059853Z mod = 'scripts.evaluation.waypoint_kpi_report'
+test	Run tests	2025-08-18T20:45:29.8060483Z monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f04e97d5c60>
+test	Run tests	2025-08-18T20:45:29.8060747Z 
+test	Run tests	2025-08-18T20:45:29.8060847Z     @pytest.mark.parametrize("mod", SCRIPTS)
+test	Run tests	2025-08-18T20:45:29.8061109Z     def test_help_runs(mod, monkeypatch):
+test	Run tests	2025-08-18T20:45:29.8061432Z         # Run the module as a script with --help; argparse should exit cleanly.
+test	Run tests	2025-08-18T20:45:29.8061832Z         monkeypatch.setattr(sys, "argv", [mod.rsplit(".", 1)[-1], "--help"])
+test	Run tests	2025-08-18T20:45:29.8062173Z         with pytest.raises(SystemExit):
+test	Run tests	2025-08-18T20:45:29.8062427Z >           runpy.run_module(mod, run_name="__main__")
+test	Run tests	2025-08-18T20:45:29.8062611Z 
+test	Run tests	2025-08-18T20:45:29.8062691Z tests/test_cli_smoke.py:27: 
+test	Run tests	2025-08-18T20:45:29.8062922Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test	Run tests	2025-08-18T20:45:29.8063314Z /opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/runpy.py:227: in run_module
+test	Run tests	2025-08-18T20:45:29.8063737Z     return _run_code(code, {}, init_globals, run_name, mod_spec)
+test	Run tests	2025-08-18T20:45:29.8064134Z /opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/runpy.py:86: in _run_code
+test	Run tests	2025-08-18T20:45:29.8064485Z     exec(code, run_globals)
+test	Run tests	2025-08-18T20:45:29.8064704Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test	Run tests	2025-08-18T20:45:29.8064889Z 
+test	Run tests	2025-08-18T20:45:29.8064961Z     #!/usr/bin/env python3
+test	Run tests	2025-08-18T20:45:29.8065161Z     from __future__ import annotations
+test	Run tests	2025-08-18T20:45:29.8065377Z     
+test	Run tests	2025-08-18T20:45:29.8065530Z     import argparse
+test	Run tests	2025-08-18T20:45:29.8065708Z     import datetime as dt
+test	Run tests	2025-08-18T20:45:29.8065902Z     import json
+test	Run tests	2025-08-18T20:45:29.8066063Z     import math
+test	Run tests	2025-08-18T20:45:29.8066224Z     import os
+test	Run tests	2025-08-18T20:45:29.8066384Z     import subprocess
+test	Run tests	2025-08-18T20:45:29.8066580Z     from pathlib import Path
+test	Run tests	2025-08-18T20:45:29.8066919Z     from typing import List, Tuple
+test	Run tests	2025-08-18T20:45:29.8067131Z     
+test	Run tests	2025-08-18T20:45:29.8067272Z     try:
+test	Run tests	2025-08-18T20:45:29.8067434Z         import mlflow
+test	Run tests	2025-08-18T20:45:29.8067612Z     except Exception:
+test	Run tests	2025-08-18T20:45:29.8067838Z         mlflow = None  # optional for --help/import in CI
+test	Run tests	2025-08-18T20:45:29.8068112Z     import pandas as pd
+test	Run tests	2025-08-18T20:45:29.8068327Z >   from mlflow.tracking import MlflowClient
+test	Run tests	2025-08-18T20:45:29.8068611Z E   ModuleNotFoundError: No module named 'mlflow'
+test	Run tests	2025-08-18T20:45:29.8068800Z 
+test	Run tests	2025-08-18T20:45:29.8068970Z scripts/evaluation/waypoint_kpi_report.py:18: ModuleNotFoundError
+test	Run tests	2025-08-18T20:45:29.8069327Z =============================== warnings summary ===============================
+test	Run tests	2025-08-18T20:45:29.8069818Z tests/test_cli_smoke.py::test_help_runs[scripts.evaluation.assert_hover_kpis]
+test	Run tests	2025-08-18T20:45:29.8071122Z   /opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/runpy.py:126: RuntimeWarning: 'scripts.evaluation.assert_hover_kpis' found in sys.modules after import of package 'scripts.evaluation', but prior to execution of 'scripts.evaluation.assert_hover_kpis'; this may result in unpredictable behaviour
+test	Run tests	2025-08-18T20:45:29.8072157Z     warn(RuntimeWarning(msg))
+test	Run tests	2025-08-18T20:45:29.8072301Z 
+test	Run tests	2025-08-18T20:45:29.8072494Z tests/test_cli_smoke.py::test_help_runs[scripts.evaluation.assert_mission_kpis]
+test	Run tests	2025-08-18T20:45:29.8073632Z   /opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/runpy.py:126: RuntimeWarning: 'scripts.evaluation.assert_mission_kpis' found in sys.modules after import of package 'scripts.evaluation', but prior to execution of 'scripts.evaluation.assert_mission_kpis'; this may result in unpredictable behaviour
+test	Run tests	2025-08-18T20:45:29.8074766Z     warn(RuntimeWarning(msg))
+test	Run tests	2025-08-18T20:45:29.8074901Z 
+test	Run tests	2025-08-18T20:45:29.8075087Z tests/test_cli_smoke.py::test_help_runs[scripts.evaluation.eval_perception]
+test	Run tests	2025-08-18T20:45:29.8076193Z   /opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/runpy.py:126: RuntimeWarning: 'scripts.evaluation.eval_perception' found in sys.modules after import of package 'scripts.evaluation', but prior to execution of 'scripts.evaluation.eval_perception'; this may result in unpredictable behaviour
+test	Run tests	2025-08-18T20:45:29.8077185Z     warn(RuntimeWarning(msg))
+test	Run tests	2025-08-18T20:45:29.8077320Z 
+test	Run tests	2025-08-18T20:45:29.8077499Z tests/test_cli_smoke.py::test_help_runs[scripts.evaluation.hover_kpi_report]
+test	Run tests	2025-08-18T20:45:29.8078603Z   /opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/runpy.py:126: RuntimeWarning: 'scripts.evaluation.hover_kpi_report' found in sys.modules after import of package 'scripts.evaluation', but prior to execution of 'scripts.evaluation.hover_kpi_report'; this may result in unpredictable behaviour
+test	Run tests	2025-08-18T20:45:29.8079595Z     warn(RuntimeWarning(msg))
+test	Run tests	2025-08-18T20:45:29.8079728Z 
+test	Run tests	2025-08-18T20:45:29.8079909Z -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+test	Run tests	2025-08-18T20:45:29.8080457Z =========================== short test summary info ============================
+test	Run tests	2025-08-18T20:45:29.8081103Z FAILED tests/test_cli_smoke.py::test_imports[scripts.evaluation.log_dummy_metrics] - AttributeError: 'NoneType' object has no attribute 'set_tracking_uri'
+test	Run tests	2025-08-18T20:45:29.8081955Z FAILED tests/test_cli_smoke.py::test_imports[scripts.evaluation.waypoint_kpi_report] - ModuleNotFoundError: No module named 'mlflow'
+test	Run tests	2025-08-18T20:45:29.8082808Z FAILED tests/test_cli_smoke.py::test_help_runs[scripts.evaluation.log_dummy_metrics] - AttributeError: 'NoneType' object has no attribute 'set_tracking_uri'
+test	Run tests	2025-08-18T20:45:29.8479050Z FAILED tests/test_cli_smoke.py::test_help_runs[scripts.evaluation.waypoint_kpi_report] - ModuleNotFoundError: No module named 'mlflow'
+test	Run tests	2025-08-18T20:45:29.8479793Z 4 failed, 15 passed, 4 warnings in 0.97s
+test	Run tests	2025-08-18T20:45:29.8964987Z ##[error]Process completed with exit code 1.
+test	Post Run actions/checkout@v4	﻿2025-08-18T20:45:29.9086808Z Post job cleanup.
+test	Post Run actions/checkout@v4	2025-08-18T20:45:30.0007906Z [command]/usr/bin/git version
+test	Post Run actions/checkout@v4	2025-08-18T20:45:30.0043219Z git version 2.50.1
+test	Post Run actions/checkout@v4	2025-08-18T20:45:30.0093086Z Temporarily overriding HOME='/home/runner/work/_temp/2b9eb310-afb0-4927-93e7-411ce949fe46' before making global git config changes
+test	Post Run actions/checkout@v4	2025-08-18T20:45:30.0094324Z Adding repository directory to the temporary git global config as a safe directory
+test	Post Run actions/checkout@v4	2025-08-18T20:45:30.0099060Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/northstrike-training/northstrike-training
+test	Post Run actions/checkout@v4	2025-08-18T20:45:30.0133967Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test	Post Run actions/checkout@v4	2025-08-18T20:45:30.0165792Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test	Post Run actions/checkout@v4	2025-08-18T20:45:30.0385950Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test	Post Run actions/checkout@v4	2025-08-18T20:45:30.0406780Z http.https://github.com/.extraheader
+test	Post Run actions/checkout@v4	2025-08-18T20:45:30.0419700Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+test	Post Run actions/checkout@v4	2025-08-18T20:45:30.0449358Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test	Complete job	﻿2025-08-18T20:45:30.0766394Z Cleaning up orphan processes
