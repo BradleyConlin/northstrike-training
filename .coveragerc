@@ -1,7 +1,7 @@
 [run]
-branch = True
-source = eval, control, planning
-omit = */tests/*, docs/*, .venv/*, scripts/*, **/__init__.py
+branch=True
+source=eval,control,planning
+omit=*/tests/*,docs/*,.venv/*,scripts/*,**/__init__.py
 [report]
-show_missing = True
-skip_empty = True
+show_missing=True
+skip_empty=True
