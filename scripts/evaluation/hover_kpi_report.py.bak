@@ -158,7 +158,9 @@ def main() -> None:
     kpis = compute_hover_kpis(df)
 
     ts = time.strftime("%Y%m%d_%H%M%S")
-    outdir = Path(args.outdir) if args.outdir else Path("benchmarks/reports") / f"hover_{ts}"
+    outdir = (
+        Path(args.outdir) if args.outdir else Path("benchmarks/reports") / f"hover_{ts}"
+    )
     outdir.mkdir(parents=True, exist_ok=True)
 
     p1, p2 = make_plots(df, outdir, kpis["alt_ref_m"])

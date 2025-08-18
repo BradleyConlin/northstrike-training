@@ -12,7 +12,9 @@ class Px4GzHoverEnv(gym.Env):
 
     def __init__(self, cfg: dict | None = None):
         self.cfg = cfg or {}
-        self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(6,), dtype=np.float32)
+        self.observation_space = spaces.Box(
+            low=-np.inf, high=np.inf, shape=(6,), dtype=np.float32
+        )
         self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(4,), dtype=np.float32)
 
     def reset(self, *, seed: int | None = None, options: dict | None = None):
