@@ -28,7 +28,10 @@ def haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     p2 = math.radians(lat2)
     dphi = math.radians(lat2 - lat1)
     dlambda = math.radians(lon2 - lon1)
-    a = math.sin(dphi / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dlambda / 2) ** 2
+    a = (
+        math.sin(dphi / 2) ** 2
+        + math.cos(p1) * math.cos(p2) * math.sin(dlambda / 2) ** 2
+    )
     return 2 * r * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
 
 
@@ -74,7 +77,9 @@ def compute_kpis(
 
     dists = []
     for lat_wp, lon_wp in waypoints:
-        dmin = min(haversine_m(lat_wp, lon_wp, lat, lon) for lat, lon in zip(lats, lons))
+        dmin = min(
+            haversine_m(lat_wp, lon_wp, lat, lon) for lat, lon in zip(lats, lons)
+        )
         dists.append(dmin)
 
     visited = sum(d <= visit_radius_m for d in dists)
