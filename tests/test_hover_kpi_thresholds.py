@@ -8,7 +8,9 @@ import numpy as np
 import pandas as pd
 
 
-def _make_hover_csv(path: Path, hz=50, duration_s=10.0, alt_m=1.5, z_std=0.02, seed=123):
+def _make_hover_csv(
+    path: Path, hz=50, duration_s=10.0, alt_m=1.5, z_std=0.02, seed=123
+):
     rng = np.random.default_rng(seed)
     n = int(hz * duration_s)
     t = np.arange(n) / hz
@@ -22,10 +24,17 @@ def _make_hover_csv(path: Path, hz=50, duration_s=10.0, alt_m=1.5, z_std=0.02, s
 
 
 def _run_cli(csv_path: Path) -> dict:
-    cmd = [sys.executable, "scripts/evaluation/hover_kpi_report.py", "--csv", str(csv_path)]
+    cmd = [
+        sys.executable,
+        "scripts/evaluation/hover_kpi_report.py",
+        "--csv",
+        str(csv_path),
+    ]
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
-        raise AssertionError(f"KPI CLI failed:\nSTDOUT:\n{res.stdout}\nSTDERR:\n{res.stderr}")
+        raise AssertionError(
+            f"KPI CLI failed:\nSTDOUT:\n{res.stdout}\nSTDERR:\n{res.stderr}"
+        )
     text = res.stdout.strip()
     try:
         return json.loads(text)
