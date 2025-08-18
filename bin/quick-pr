@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -e
+pytest -q || true
+pre-commit run --all-files || true
+git add -A
+git diff --cached --quiet || git commit -m "${1:-chore: small update}"
+git push -u origin HEAD
+gh pr create --fill --base main || true
