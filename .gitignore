@@ -63,3 +63,6 @@ job_*.log
 mlruns/
 mlartifacts/
 mlruns.db*
+
+# simulation outputs
+artifacts/
