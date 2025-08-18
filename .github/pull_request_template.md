@@ -1,0 +1,3 @@
+- [ ] Pre-commit ran locally (`pre-commit run --all-files`)
+- [ ] Tests pass locally (`pytest -q`)
+- [ ] CI is green

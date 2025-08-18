@@ -1,8 +1,28 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
+
+# 0) local checks (never block; just tidy code)
 pytest -q || true
 pre-commit run --all-files || true
+
+# 1) commit anything staged or new
 git add -A
-git diff --cached --quiet || git commit -m "${1:-chore: small update}"
+if ! git diff --cached --quiet; then
+  git commit -m "${1:-chore: small update}"
+fi
+
+# 2) push current branch (creates remote if needed)
 git push -u origin HEAD
-gh pr create --fill --base main || true
+
+# 3) create PR if missing, otherwise no-op
+gh pr create --fill --base main 2>/dev/null || true
+
+# 4) mark PR for auto-merge (squash) and open latest CI run
+PR_NUM=$(gh pr view --json number -q .number)
+gh pr merge "$PR_NUM" --auto --squash || true
+
+# open the newest CI run for this PR’s head branch
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+RID=$(gh run list --workflow=ci.yml -L 20 --json databaseId,headBranch \
+      --jq "map(select(.headBranch==\"${BRANCH}\")) | .[0].databaseId")
+[ -n "$RID" ] && gh run view "$RID" --web || true
