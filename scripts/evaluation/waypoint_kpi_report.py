@@ -36,7 +36,9 @@ def _git_sha() -> str:
 
 def _github_base() -> str | None:
     try:
-        url = subprocess.check_output(["git", "config", "remote.origin.url"], text=True).strip()
+        url = subprocess.check_output(
+            ["git", "config", "remote.origin.url"], text=True
+        ).strip()
         if url.startswith("git@github.com:"):
             userrepo = url.split(":", 1)[1].removesuffix(".git")
             return f"https://github.com/{userrepo}"

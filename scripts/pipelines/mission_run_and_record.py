@@ -40,7 +40,11 @@ def parse_qgc_plan(path: Path) -> list[Waypoint]:
     items = d.get("mission", {}).get("items", [])
     wps: list[Waypoint] = []
     for it in items:
-        if "coordinate" in it and isinstance(it["coordinate"], list) and len(it["coordinate"]) >= 3:
+        if (
+            "coordinate" in it
+            and isinstance(it["coordinate"], list)
+            and len(it["coordinate"]) >= 3
+        ):
             lat, lon, alt = it["coordinate"][:3]
             wps.append(Waypoint(float(lat), float(lon), float(alt)))
             continue
@@ -309,7 +313,9 @@ async def fly_mission(
         moved_m = 0.0
 
     if moved_m < 5.0:
-        print(f"⚠️  Little/no XY motion after start (~{moved_m:.1f} m) — switching to fallback.")
+        print(
+            f"⚠️  Little/no XY motion after start (~{moved_m:.1f} m) — switching to fallback."
+        )
         await fly_goto_fallback(drone, wps_for_fallback)
         return
 
@@ -361,7 +367,9 @@ async def main(plan_path: Path, hz: int) -> None:
     out_dir = Path("datasets/flight_logs")
     out_dir.mkdir(parents=True, exist_ok=True)
     csv_path = out_dir / f"mission_{_ts()}.csv"
-    rec_task = asyncio.create_task(telemetry_recorder(drone, csv_path, hz), name="recorder")
+    rec_task = asyncio.create_task(
+        telemetry_recorder(drone, csv_path, hz), name="recorder"
+    )
 
     # Fly (mission → fallback if needed)
     try:
