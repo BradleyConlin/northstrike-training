@@ -58,3 +58,8 @@ htmlcov/
 # CI artifacts
 ci_run_*.log
 job_*.log
+
+# local MLflow
+mlruns/
+mlartifacts/
+mlruns.db*
