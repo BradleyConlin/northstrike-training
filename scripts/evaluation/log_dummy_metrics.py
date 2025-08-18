@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import random
 
-import mlflow
-
+try:
+    import mlflow
+except Exception:
+    mlflow = None  # optional for --help/import in CI
 mlflow.set_tracking_uri("http://127.0.0.1:5000")
 mlflow.set_experiment("sanity")
 with mlflow.start_run(run_name="dummy"):
