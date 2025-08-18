@@ -54,3 +54,7 @@ logs/
 # coverage artifacts
 .coverage*
 htmlcov/
+
+# CI artifacts
+ci_run_*.log
+job_*.log
