@@ -1,11 +1,7 @@
 [run]
 branch = True
-parallel = True             # allow combining child-process data
-source =
-    eval
-    control
-    planning
-    scripts
+parallel = True
+source = .
 omit =
     */tests/*
     docs/*
