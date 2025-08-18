@@ -50,3 +50,7 @@ datasets/flight_logs/**
 # CI downloads
 logs/
 *.zip
+
+# coverage artifacts
+.coverage*
+htmlcov/
