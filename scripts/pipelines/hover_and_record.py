@@ -69,13 +69,26 @@ async def recorder_task(
         async for ia in drone.telemetry.in_air():
             state["in_air"] = 1 if ia else 0
 
-    subs = [asyncio.create_task(c()) for c in (sub_position, sub_vel, sub_batt, sub_air)]
+    subs = [
+        asyncio.create_task(c()) for c in (sub_position, sub_vel, sub_batt, sub_air)
+    ]
     t0 = time.time()
 
     with csv_path.open("w", newline="") as f:
         w = csv.writer(f)
         w.writerow(
-            ["t", "lat", "lon", "abs_alt_m", "rel_alt_m", "vn", "ve", "vd", "battery_pct", "in_air"]
+            [
+                "t",
+                "lat",
+                "lon",
+                "abs_alt_m",
+                "rel_alt_m",
+                "vn",
+                "ve",
+                "vd",
+                "battery_pct",
+                "in_air",
+            ]
         )
         try:
             while not stop_evt.is_set():
@@ -142,7 +155,12 @@ async def main(alt: float, hold_s: float, hz: float) -> None:
 
     # Compute KPIs + MLflow logging (re-use existing CLI)
     print("📈 Computing KPIs + logging to MLflow…")
-    cmd = [sys.executable, "scripts/evaluation/hover_kpi_report.py", "--csv", str(csv_path)]
+    cmd = [
+        sys.executable,
+        "scripts/evaluation/hover_kpi_report.py",
+        "--csv",
+        str(csv_path),
+    ]
     subprocess.run(cmd, check=True)
 
 

@@ -163,7 +163,9 @@ def compute_hover_kpis(
     hover_rms_m: Optional[float] = (
         alt_rmse
         if alt_rmse is not None
-        else (alt_std if not (isinstance(alt_std, float) and np.isnan(alt_std)) else None)
+        else (
+            alt_std if not (isinstance(alt_std, float) and np.isnan(alt_std)) else None
+        )
     )
 
     xy_std: Optional[float] = None
