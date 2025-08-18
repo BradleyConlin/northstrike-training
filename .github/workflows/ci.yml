@@ -34,7 +34,9 @@ jobs:
       - name: Test with coverage (3.10)
         if: matrix.python-version == '3.10'
         run: |
-          pytest -q --maxfail=1 --disable-warnings --cov --cov-report=term-missing --cov-fail-under=75
+          coverage run -m pytest -q --maxfail=1 --disable-warnings
+coverage combine
+coverage report -m --fail-under=75
           # merge any child .coverage.* files (belt-and-suspenders)
           coverage combine || true
           coverage report -m
