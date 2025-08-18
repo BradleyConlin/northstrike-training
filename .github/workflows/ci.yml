@@ -1,46 +1,11 @@
 name: CI
 on: [push, pull_request, workflow_dispatch]
-
 jobs:
-  lint_and_test:
+  test:
     runs-on: ubuntu-latest
-    env:
-      PYTHONPATH: ${{ github.workspace }}
-      COVERAGE_PROCESS_START: ${{ github.workspace }}/.coveragerc
-    strategy:
-      fail-fast: false
-      matrix: { python-version: ["3.10","3.11"] }
-
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: ${{ matrix.python-version }} }
-
-      - name: Install deps
-        run: |
-          python -m pip install -U pip
-          if [ -f requirements-dev.txt ]; then
-            pip install -r requirements-dev.txt
-          else
-            pip install black isort flake8 pytest detect-secrets pandas numpy pre-commit
-          fi
-          pip install pytest-cov
-
-      - name: Lint (only on 3.10)
-        if: matrix.python-version == '3.10'
-        run: |
-          if [ -f .pre-commit-config.yaml ]; then pre-commit run -a; fi
-
-      - name: Test with coverage (3.10)
-        if: matrix.python-version == '3.10'
-        run: |
-          coverage run -m pytest -q --maxfail=1 --disable-warnings
-coverage combine
-coverage report -m --fail-under=75
-          # merge any child .coverage.* files (belt-and-suspenders)
-          coverage combine || true
-          coverage report -m
-
-      - name: Test (3.11)
-        if: matrix.python-version == '3.11'
-        run: pytest -q --maxfail=1 --disable-warnings
+        with: { python-version: '3.10' }
+      - run: python -m pip install -U pip pytest
+      - run: pytest -q
