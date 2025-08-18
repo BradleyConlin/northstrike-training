@@ -1,0 +1,14 @@
+[run]
+branch = True
+parallel = True
+source = .
+omit =
+    */tests/*
+    docs/*
+    .venv/*
+    **/__init__.py
+    scripts/evaluation/*.py   # omit CLI wrappers
+
+[report]
+show_missing = True
+skip_empty = True

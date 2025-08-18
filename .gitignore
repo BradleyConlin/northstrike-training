@@ -50,3 +50,19 @@ datasets/flight_logs/**
 # CI downloads
 logs/
 *.zip
+
+# coverage artifacts
+.coverage*
+htmlcov/
+
+# CI artifacts
+ci_run_*.log
+job_*.log
+
+# local MLflow
+mlruns/
+mlartifacts/
+mlruns.db*
+
+# simulation outputs
+artifacts/

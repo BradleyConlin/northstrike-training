@@ -10,9 +10,16 @@ import subprocess
 from pathlib import Path
 from typing import List, Tuple
 
-import mlflow
+try:
+    import mlflow
+except Exception:
+    mlflow = None  # optional for --help/import in CI
 import pandas as pd
-from mlflow.tracking import MlflowClient
+
+try:
+    from mlflow.tracking import MlflowClient  # type: ignore
+except Exception:
+    MlflowClient = None  # type: ignore
 
 
 def _set_mlflow() -> None:
