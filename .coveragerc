@@ -1,7 +1,17 @@
 [run]
-branch=True
-source=eval,control,planning
-omit=*/tests/*,docs/*,.venv/*,scripts/*,**/__init__.py
+branch = True
+parallel = True             # allow combining child-process data
+source =
+    eval
+    control
+    planning
+    scripts
+omit =
+    */tests/*
+    docs/*
+    .venv/*
+    **/__init__.py
+
 [report]
-show_missing=True
-skip_empty=True
+show_missing = True
+skip_empty = True
