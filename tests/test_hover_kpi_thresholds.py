@@ -51,11 +51,9 @@ def test_hover_kpi_thresholds(tmp_path: Path):
     try:
         data = _run_cli(csv_path)
     except AssertionError:
-        # Fallback: import and compute directly if CLI args change
-        from scripts.evaluation.hover_kpi_report import compute_hover_kpis
+        from eval.core import compute_hover_kpis
 
-        df = pd.read_csv(csv_path)
-        data = compute_hover_kpis(df)
+        data = compute_hover_kpis(pd.read_csv(csv_path))
     assert data["samples"] >= 400
     assert 0.0 < data["duration_s"] <= 15.0
     assert 1.4 < data["alt_mean"] < 1.6
