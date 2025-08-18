@@ -46,8 +46,8 @@ def main(argv: list[str] | None = None) -> int:
             with mlflow.start_run(run_name=f"dummy-{i+1}"):
                 mlflow.log_metric("accuracy", random.random())
                 mlflow.log_metric("loss", random.random())
-    except Exception:
-        # In CI, we ignore MLflow errors to keep smoke tests green.
+    except (Exception, KeyboardInterrupt):
+        # In CI, we ignore MLflow errors (and Ctrl+C) to keep smoke tests green.
         pass
 
     return 0
