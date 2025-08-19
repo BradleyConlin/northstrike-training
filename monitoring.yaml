@@ -36,6 +36,10 @@ items:
   - perception/**
   - cv/**
   - models/**
+  - src/perception/*.py
+  - scripts/perception/*.py
+  - artifacts/perception_out/detections.csv
+  - tests/perception/*.py
 - id: 6
   name: Multi-Agent Coordination & Swarm Behaviour
   seed: red
