@@ -1,0 +1,4 @@
+experiment_name: northstrike
+tracking_uri: "file:./mlruns"
+run_name: log-last-training
+model_name: northstrike_dummy

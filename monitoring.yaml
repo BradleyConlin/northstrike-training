@@ -96,6 +96,9 @@ items:
   green_globs:
   - scripts/evaluation/log_dummy_metrics.py
   - mlflow.yaml
+  - configs/mlops/*.yaml
+  - scripts/mlops/*.py
+  - tests/mlops/*.py
 - id: 11
   name: RL Stack & Safety-Aware Training
   seed: red

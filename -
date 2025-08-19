@@ -1,6 +1,6 @@
 # 24-Point Status Snapshot
 
-**Totals:** 🟢 9 · 🟡 6 · 🔴 9
+**Totals:** 🟢 13 · 🟡 3 · 🔴 8
 
 | # | Area | Status |
 |---:|------|:------:|
@@ -10,10 +10,10 @@
 | 4 | Sensor Fusion & State Estimation | 🟢 |
 | 5 | Perception & Computer Vision | 🟢 |
 | 6 | Multi-Agent Coordination & Swarm Behaviour | 🟢 |
-| 7 | Domain-Specific Models & Tools | 🔴 |
-| 8 | Training Infrastructure & Tools | 🟡 |
-| 9 | Compatibility Considerations | 🟡 |
-| 10 | MLOps & Experiment Tracking | 🟡 |
+| 7 | Domain-Specific Models & Tools | 🟢 |
+| 8 | Training Infrastructure & Tools | 🟢 |
+| 9 | Compatibility Considerations | 🟢 |
+| 10 | MLOps & Experiment Tracking | 🟢 |
 | 11 | RL Stack & Safety-Aware Training | 🔴 |
 | 12 | SysID & Flight-Model Calibration | 🔴 |
 | 13 | Fixed-Wing Control (TECS & L1) | 🔴 |
