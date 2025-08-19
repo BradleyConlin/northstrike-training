@@ -121,3 +121,7 @@ test-unit:
 
 test-sim:
 \tpytest -q tests/simulation --maxfail=1 --disable-warnings
+
+bench:
+	python -m scripts.evaluation.compare_planners_sweep --seeds 3 --sim-seconds 2.0
+	python -m scripts.evaluation.run_waypoint_controller_bench --controller lqr --seeds 3 --sim-seconds 1.5 && python -m scripts.evaluation.run_waypoint_controller_bench --controller pp --seeds 3 --sim-seconds 1.5
