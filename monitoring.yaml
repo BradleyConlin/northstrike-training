@@ -1,25 +1,158 @@
 items:
-  - {id: 1,  name: "Simulation & Data-Generation Tools",            seed: "yellow", green_globs: ["sim/**","scripts/sim*"] }
-  - {id: 2,  name: "Path-Planning Algorithms",                      seed: "yellow", green_globs: ["planning/**","scripts/**/plan*"] }
-  - {id: 3,  name: "Flight-Control Algorithms",                     seed: "yellow", green_globs: ["control/**","scripts/**/control*"] }
-  - {id: 4,  name: "Sensor Fusion & State Estimation",              seed: "red",    green_globs: ["state_estimation/**","fusion/**"] }
-  - {id: 5,  name: "Perception & Computer Vision",                  seed: "yellow", green_globs: ["perception/**","cv/**","models/**"] }
-  - {id: 6,  name: "Multi-Agent Coordination & Swarm Behaviour",    seed: "red",    green_globs: ["swarm/**","multi_agent/**"] }
-  - {id: 7,  name: "Domain-Specific Models & Tools",                seed: "red",    green_globs: ["aero/**","terrain/**","wind/**"] }
-  - {id: 8,  name: "Training Infrastructure & Tools",               seed: "yellow", green_globs: ["train.py","training/**"] }
-  - {id: 9,  name: "Compatibility Considerations",                  seed: "yellow", green_globs: [".tool-versions",".python-version","tox.ini","noxfile.py"] }
-  - {id: 10, name: "MLOps & Experiment Tracking",                   seed: "green",  green_globs: ["scripts/evaluation/log_dummy_metrics.py","mlflow.yaml"] }
-  - {id: 11, name: "RL Stack & Safety-Aware Training",              seed: "red",    green_globs: ["rl/**","scripts/**/train_rl*"] }
-  - {id: 12, name: "SysID & Flight-Model Calibration",              seed: "red",    green_globs: ["sysid/**","scripts/**/fit_*","data/sysid/**"] }
-  - {id: 13, name: "Fixed-Wing Control (TECS & L1)",                seed: "red",    green_globs: ["control/tecs/**","control/l1/**"] }
-  - {id: 14, name: "Hardware-in-the-Loop (HIL) & Bench Testing",    seed: "red",    green_globs: ["hil/**","bench/**"] }
-  - {id: 15, name: "Domain Randomization & Sim-to-Real",            seed: "red",    green_globs: ["randomization/**","sim2real/**"] }
-  - {id: 16, name: "Evaluation Benchmarks & KPIs",                  seed: "green",  green_globs: ["scripts/evaluation/**","tests/**/assert_*"] }
-  - {id: 17, name: "Post-Deployment Observability & Drift",         seed: "red",    green_globs: ["postdeploy/**","monitoring/**"] }
-  - {id: 18, name: "Edge Packaging & Performance Budgets",          seed: "red",    green_globs: ["edge/**","packaging/**"] }
-  - {id: 19, name: "Data Labeling, QA & Governance",                seed: "red",    green_globs: ["datasets/**/manifest.*","scripts/**/validate_dataset*"] }
-  - {id: 20, name: "Safety, Compliance & SOPs (Transport Canada)",  seed: "red",    green_globs: ["docs/safety/**","docs/compliance/**"] }
-  - {id: 21, name: "Secrets & Config Hygiene",                      seed: "green",  green_globs: [".pre-commit-config.yaml",".env.sample","config/**"] }
-  - {id: 22, name: "CI/CD & Release Engineering",                   seed: "green",  green_globs: [".github/workflows/*.yml",".github/workflows/*.yaml"] }
-  - {id: 23, name: "Architecture Decision Records (ADRs)",          seed: "yellow", green_globs: ["docs/adr/**","docs/adrs/**"] }
-  - {id: 24, name: "Mission & Parameter Bundles",                   seed: "yellow", green_globs: ["missions/**","*.bundle.yaml","**/mission*.yaml"] }
+- id: 1
+  name: Simulation & Data-Generation Tools
+  seed: yellow
+  green_globs:
+  - sim/**
+  - scripts/sim*
+- id: 2
+  name: Path-Planning Algorithms
+  seed: yellow
+  green_globs:
+  - planning/**
+  - scripts/**/plan*
+- id: 3
+  name: Flight-Control Algorithms
+  seed: yellow
+  green_globs:
+  - control/**
+  - scripts/**/control*
+- id: 4
+  name: Sensor Fusion & State Estimation
+  seed: red
+  green_globs:
+  - state_estimation/**
+  - fusion/**
+  - src/estimators/*.py
+  - scripts/pipelines/*estimator*.py
+  - artifacts/waypoint_run_ekf.csv
+  - artifacts/waypoint_plot_ekf.png
+  - scripts/pipelines/estimator_offline.py
+  - tests/estimators/*.py
+- id: 5
+  name: Perception & Computer Vision
+  seed: yellow
+  green_globs:
+  - perception/**
+  - cv/**
+  - models/**
+- id: 6
+  name: Multi-Agent Coordination & Swarm Behaviour
+  seed: red
+  green_globs:
+  - swarm/**
+  - multi_agent/**
+- id: 7
+  name: Domain-Specific Models & Tools
+  seed: red
+  green_globs:
+  - aero/**
+  - terrain/**
+  - wind/**
+- id: 8
+  name: Training Infrastructure & Tools
+  seed: yellow
+  green_globs:
+  - train.py
+  - training/**
+- id: 9
+  name: Compatibility Considerations
+  seed: yellow
+  green_globs:
+  - .tool-versions
+  - .python-version
+  - tox.ini
+  - noxfile.py
+- id: 10
+  name: MLOps & Experiment Tracking
+  seed: green
+  green_globs:
+  - scripts/evaluation/log_dummy_metrics.py
+  - mlflow.yaml
+- id: 11
+  name: RL Stack & Safety-Aware Training
+  seed: red
+  green_globs:
+  - rl/**
+  - scripts/**/train_rl*
+- id: 12
+  name: SysID & Flight-Model Calibration
+  seed: red
+  green_globs:
+  - sysid/**
+  - scripts/**/fit_*
+  - data/sysid/**
+- id: 13
+  name: Fixed-Wing Control (TECS & L1)
+  seed: red
+  green_globs:
+  - control/tecs/**
+  - control/l1/**
+- id: 14
+  name: Hardware-in-the-Loop (HIL) & Bench Testing
+  seed: red
+  green_globs:
+  - hil/**
+  - bench/**
+- id: 15
+  name: Domain Randomization & Sim-to-Real
+  seed: red
+  green_globs:
+  - randomization/**
+  - sim2real/**
+- id: 16
+  name: Evaluation Benchmarks & KPIs
+  seed: green
+  green_globs:
+  - scripts/evaluation/**
+  - tests/**/assert_*
+- id: 17
+  name: Post-Deployment Observability & Drift
+  seed: red
+  green_globs:
+  - postdeploy/**
+  - monitoring/**
+- id: 18
+  name: Edge Packaging & Performance Budgets
+  seed: red
+  green_globs:
+  - edge/**
+  - packaging/**
+- id: 19
+  name: Data Labeling, QA & Governance
+  seed: red
+  green_globs:
+  - datasets/**/manifest.*
+  - scripts/**/validate_dataset*
+- id: 20
+  name: Safety, Compliance & SOPs (Transport Canada)
+  seed: red
+  green_globs:
+  - docs/safety/**
+  - docs/compliance/**
+- id: 21
+  name: Secrets & Config Hygiene
+  seed: green
+  green_globs:
+  - .pre-commit-config.yaml
+  - .env.sample
+  - config/**
+- id: 22
+  name: CI/CD & Release Engineering
+  seed: green
+  green_globs:
+  - .github/workflows/*.yml
+  - .github/workflows/*.yaml
+- id: 23
+  name: Architecture Decision Records (ADRs)
+  seed: yellow
+  green_globs:
+  - docs/adr/**
+  - docs/adrs/**
+- id: 24
+  name: Mission & Parameter Bundles
+  seed: yellow
+  green_globs:
+  - missions/**
+  - '*.bundle.yaml'
+  - '**/mission*.yaml'

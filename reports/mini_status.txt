@@ -1,0 +1,24 @@
+ 1 Simulation & Data-Generation Tools: 6
+ 2 Path-Planning Algorithms: 2
+ 3 Flight-Control Algorithms: 5
+ 4 Sensor Fusion & State Estimation: 0
+ 5 Perception & Computer Vision: 0
+ 6 Multi-Agent Coordination & Swarm Behaviour: 0
+ 7 Domain-Specific Models & Tools: 0
+ 8 Training Infrastructure & Tools: 0
+ 9 Compatibility Considerations: 0
+10 MLOps & Experiment Tracking: 1
+11 RL Stack & Safety-Aware Training: 0
+12 SysID & Flight-Model Calibration: 0
+13 Fixed-Wing Control (TECS & L1): 0
+14 Hardware-in-the-Loop (HIL) & Bench Testing: 1
+15 Domain Randomization & Sim-to-Real: 0
+16 Evaluation Benchmarks & KPIs: 21
+17 Post-Deployment Observability & Drift: 0
+18 Edge Packaging & Performance Budgets: 0
+19 Data Labeling, QA & Governance: 0
+20 Safety, Compliance & SOPs (Transport Canada): 0
+21 Secrets & Config Hygiene: 1
+22 CI/CD & Release Engineering: 5
+23 Architecture Decision Records (ADRs): 4
+24 Mission & Parameter Bundles: 0

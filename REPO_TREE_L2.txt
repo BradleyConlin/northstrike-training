@@ -1,0 +1,240 @@
+.
+├── -
+├── artifacts
+│   ├── bench_2025-08-19_0933
+│   ├── bench_2025-08-19_0946
+│   ├── bench_ctrl_2025-08-19_1044
+│   ├── bench_ctrl_2025-08-19_1100
+│   ├── bench_ctrl_2025-08-19_1108
+│   ├── bench_ctrl_2025-08-19_1111
+│   ├── bench_ctrl_2025-08-19_1117
+│   ├── bench_ctrl_2025-08-19_1147
+│   ├── bench_ctrl_2025-08-19_1148
+│   ├── bench_ctrl_2025-08-19_1211
+│   ├── bench_ctrl_2025-08-19_1232
+│   ├── bench_ctrl_2025-08-19_1235
+│   ├── bench_ctrl_2025-08-19_1240
+│   ├── bench_ctrl_2025-08-19_1314
+│   ├── bench_ctrl_2025-08-19_1319
+│   ├── bench_ctrl_2025-08-19_1405
+│   ├── bench_ctrl_2025-08-19_1409
+│   ├── bench_ctrl_2025-08-19_1425
+│   ├── compare_astar.csv
+│   ├── compare_astar.json
+│   ├── compare_planners.md
+│   ├── compare_planners_sweep.md
+│   ├── compare_rrt.csv
+│   ├── compare_rrt.json
+│   ├── controller_run_lqr_seed0.csv
+│   ├── controller_sweep_lqr.json
+│   ├── controller_sweep_lqr.md
+│   ├── sweep_astar.csv
+│   ├── sweep_astar.json
+│   ├── sweep_rrt_seed0.csv
+│   ├── sweep_rrt_seed0.json
+│   ├── sweep_rrt_seed1.csv
+│   ├── sweep_rrt_seed1.json
+│   ├── sweep_rrt_seed2.csv
+│   ├── sweep_rrt_seed2.json
+│   ├── sweep_rrt_seed3.csv
+│   ├── sweep_rrt_seed3.json
+│   ├── sweep_rrt_seed4.csv
+│   ├── sweep_rrt_seed4.json
+│   ├── sweep_rrt_seed5.csv
+│   ├── sweep_rrt_seed5.json
+│   ├── sweep_rrt_seed6.csv
+│   ├── sweep_rrt_seed6.json
+│   ├── sweep_rrt_seed7.csv
+│   ├── sweep_rrt_seed7.json
+│   ├── sweep_rrt_seed8.csv
+│   ├── sweep_rrt_seed8.json
+│   ├── sweep_rrt_seed9.csv
+│   ├── sweep_rrt_seed9.json
+│   ├── waypoint_kpis.json
+│   ├── waypoint_plot_1.png
+│   ├── waypoint_plot_2.png
+│   ├── waypoint_plot_ekf_1.png
+│   ├── waypoint_plot_ekf_2.png
+│   ├── waypoint_plot_ekf.png
+│   ├── waypoint_plot.png
+│   ├── waypoint_run.csv
+│   └── waypoint_run_ekf.csv
+├── benchmarks
+│   ├── metrics
+│   ├── reports
+│   └── scenarios
+├── bin
+│   └── quick-pr
+├── bootstrap_scaffold.sh
+├── ci_run_17051679308.log
+├── ci_run_17052075191
+├── ci_run_17052075191.log
+├── ci_run_17052915038.log
+├── ci_run_17053024088.log
+├── ci_run_17053213247.log
+├── ci_run_17071236195.log
+├── ci_run_17073180806.log
+├── ci_run_completed.log
+├── ci_run_.log
+├── configs
+│   ├── environment
+│   ├── evaluation
+│   ├── hardware
+│   ├── params
+│   ├── pid_pos.yaml
+│   ├── simulation
+│   └── training
+├── control
+│   ├── __init__.py
+│   └── pid_pos.py
+├── .coverage
+├── .coveragerc
+├── data_governance
+│   ├── dataset_versioning.md
+│   ├── labeling_sop.md
+│   ├── licenses_third_party.md
+│   └── qc_checklists.md
+├── deployment
+│   ├── docker
+│   ├── edge_builds
+│   ├── inference
+│   └── pipelines
+├── docs
+│   ├── adr
+│   ├── adrs
+│   ├── algorithms_overview.md
+│   ├── architecture_overview.md
+│   ├── compatibility
+│   ├── data_schema.md
+│   ├── dependencies.md
+│   ├── DEV_SETUP.md
+│   └── usage_instructions.md
+├── environment.yml
+├── fix_scaffold.sh
+├── .flake8
+├── .github
+│   ├── ISSUE_TEMPLATE
+│   ├── protection.json
+│   ├── pull_request_template.md
+│   ├── templates
+│   └── workflows
+├── .gitignore
+├── hil
+│   ├── scripts
+│   ├── test_plans
+│   └── wiring_diagrams
+├── job_.log
+├── job_logs.zip
+├── Makefile
+├── maps
+├── mlflow_artifacts
+│   └── 287947240452701361
+├── .mlflow.log
+├── .mlflow.pid
+├── mlflow_server
+│   ├── 287947240452701361
+│   ├── 746128499768196722
+│   ├── 787224606989426531
+│   ├── models
+│   └── .trash
+├── mlops
+│   ├── mlflow
+│   ├── registry
+│   ├── reports
+│   └── scripts
+├── mlruns
+│   ├── 0
+│   ├── 297489458223772051
+│   └── .trash
+├── models
+│   ├── checkpoints
+│   ├── configs
+│   └── exported
+├── monitoring.yaml
+├── nano
+├── observability
+│   ├── dashboards
+│   ├── drift_detection
+│   ├── exporters
+│   └── telemetry_schema
+├── out
+├── planners
+│   ├── astar.py
+│   ├── __init__.py
+│   └── rrt.py
+├── planning
+├── .pre-commit-config.yaml
+├── pyproject.toml
+├── README.md
+├── reports
+│   ├── 24-point-status.md
+│   ├── 24pt-20250819-021705.txt
+│   └── snapshots
+├── REPO_TREE_L2.txt
+├── requirements-dev.txt
+├── requirements.txt
+├── run_logs.zip
+├── safety
+│   ├── geofencing
+│   ├── sop
+│   └── sora
+├── scripts
+│   ├── control
+│   ├── data_preprocessing
+│   ├── deployment
+│   ├── dev_run_sitl_qgc.sh
+│   ├── evaluation
+│   ├── get_qgc_appimage.sh
+│   ├── __init__.py
+│   ├── logging
+│   ├── pipelines
+│   ├── plot_waypoint_run.py
+│   ├── report_24.py
+│   ├── run_waypoint_demo_ekf.py
+│   ├── run_waypoint_demo.py
+│   ├── sysid
+│   ├── tools
+│   ├── training
+│   └── visualization
+├── secrets
+├── shared
+│   └── types.py
+├── sim
+│   ├── ekf_2d.py
+│   ├── __init__.py
+│   └── quad_2d.py
+├── simulation
+│   ├── domain_randomization
+│   ├── gazebo
+│   ├── missions
+│   ├── px4
+│   ├── ros2
+│   └── scripts
+├── src
+│   ├── controllers
+│   ├── estimators
+│   ├── interfaces
+│   ├── multi_agent
+│   ├── perception
+│   ├── planners
+│   ├── rl
+│   ├── sysid
+│   └── utils
+└── tests
+    ├── conftest.py
+    ├── control
+    ├── evaluation
+    ├── hil
+    ├── planners
+    ├── sim
+    ├── simulation
+    ├── test_cli_smoke.py
+    ├── test_hover_kpi_contract.py
+    ├── test_hover_kpi_offline.py
+    ├── test_hover_kpi_thresholds.py
+    ├── test_plan_checksum.py
+    ├── test_plan_gen.py
+    ├── test_schema_contract.py
+    └── unit
+
+126 directories, 111 files

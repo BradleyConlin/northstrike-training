@@ -1,13 +1,13 @@
 # 24-Point Status Snapshot
 
-**Totals:** 🟢 5 · 🟡 8 · 🔴 11
+**Totals:** 🟢 6 · 🟡 8 · 🔴 10
 
 | # | Area | Status |
 |---:|------|:------:|
 | 1 | Simulation & Data-Generation Tools | 🟢 |
 | 2 | Path-Planning Algorithms | 🟡 |
 | 3 | Flight-Control Algorithms | 🟢 |
-| 4 | Sensor Fusion & State Estimation | 🔴 |
+| 4 | Sensor Fusion & State Estimation | 🟢 |
 | 5 | Perception & Computer Vision | 🟡 |
 | 6 | Multi-Agent Coordination & Swarm Behaviour | 🔴 |
 | 7 | Domain-Specific Models & Tools | 🔴 |
