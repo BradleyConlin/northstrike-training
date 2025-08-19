@@ -1,64 +1,27 @@
-name: bench_and_report
+name: Bench & Report
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-      - feat/*
-      - feat/**
-      - ci/**
-    paths:
-      - '.github/workflows/bench_and_report.yml'
-      - 'scripts/evaluation/**'
-      - 'src/controllers/**'
-      - 'tests/**'
-      - 'pyproject.toml'
-      - 'requirements*.txt'
-  workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * *'  # daily at 09:00 UTC (tweak as you like)
 
 jobs:
   bench:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 30
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
           pip install -e .
-          python -m pip install numpy pandas
-
-      - name: Prepare artifacts dir
-        run: mkdir -p artifacts
-
       - name: Sweep A* vs RRT
-        continue-on-error: true
         run: python -m scripts.evaluation.compare_planners_sweep --seeds 10 --sim-seconds 2.0
-
-      - name: Controller micro-bench (LQR & PP)
-        continue-on-error: true
-        run: |
-          python -m scripts.evaluation.run_waypoint_controller_bench --controller lqr --seeds 10 --sim-seconds 3.0
-          python -m scripts.evaluation.run_waypoint_controller_bench --controller pp  --seeds 10 --sim-seconds 3.0
-
-      - name: Debug: list artifacts dir
-        if: ${{ always() }}
-        run: |
-          echo '== ARTIFACTS TREE =='
-          ls -lah artifacts || true
-
       - name: Upload report
-        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: planner-bench
@@ -66,8 +29,3 @@ jobs:
             artifacts/compare_planners_sweep.md
             artifacts/sweep_*.csv
             artifacts/sweep_*.json
-            artifacts/controller_run_*.csv
-            artifacts/controller_sweep_*.json
-            artifacts/controller_sweep_*.md
-          if-no-files-found: warn
-
