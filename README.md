@@ -22,3 +22,5 @@ See the repository tree and `docs/` for details.
 ## CI
 [![Lint & Unit](https://github.com/BradleyConlin/northstrike-training/actions/workflows/lint_test.yml/badge.svg)](https://github.com/BradleyConlin/northstrike-training/actions/workflows/lint_test.yml)
 [![Simulation Tests](https://github.com/BradleyConlin/northstrike-training/actions/workflows/sim_tests.yml/badge.svg)](https://github.com/BradleyConlin/northstrike-training/actions/workflows/sim_tests.yml)
+
+[![Bench & Report](https://github.com/BradleyConlin/northstrike-training/actions/workflows/bench_and_report.yml/badge.svg)](https://github.com/BradleyConlin/northstrike-training/actions/workflows/bench_and_report.yml)
