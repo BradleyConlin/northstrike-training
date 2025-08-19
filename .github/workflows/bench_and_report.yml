@@ -19,9 +19,11 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
           pip install -e .
+          python -m pip install numpy pandas
       - name: Sweep A* vs RRT
         run: python -m scripts.evaluation.compare_planners_sweep --seeds 10 --sim-seconds 2.0
       - name: Upload report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: planner-bench
