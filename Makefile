@@ -115,3 +115,9 @@ test:
 	python -m pytest -q
 
 ci_local: precommit test
+
+test-unit:
+\tpytest -q tests/unit --maxfail=1 --disable-warnings
+
+test-sim:
+\tpytest -q tests/simulation --maxfail=1 --disable-warnings
