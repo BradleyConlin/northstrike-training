@@ -18,3 +18,7 @@ See the repository tree and `docs/` for details.
 - **CI:** [![CI](https://github.com/BradleyConlin/northstrike-training/actions/workflows/ci.yml/badge.svg)](https://github.com/BradleyConlin/northstrike-training/actions/workflows/ci.yml)
 - **24-point dashboard:** [reports/24-point-status.md](reports/24-point-status.md)
 - **Waypoint demo:** `python -m scripts.run_waypoint_demo --help`
+
+## CI
+[![Lint & Unit](https://github.com/BradleyConlin/northstrike-training/actions/workflows/lint_test.yml/badge.svg)](https://github.com/BradleyConlin/northstrike-training/actions/workflows/lint_test.yml)
+[![Simulation Tests](https://github.com/BradleyConlin/northstrike-training/actions/workflows/sim_tests.yml/badge.svg)](https://github.com/BradleyConlin/northstrike-training/actions/workflows/sim_tests.yml)
