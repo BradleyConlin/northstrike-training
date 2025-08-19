@@ -26,3 +26,13 @@ def test_invalid_inputs():
         assert False, "expected ValueError"
     except ValueError:
         pass
+
+
+def test_astar_diagonal_and_simplify_shorter():
+    w, h = 10, 10
+    grid = [[0 for _ in range(w)] for _ in range(h)]
+    from planners.astar import plan_on_grid
+
+    p4 = plan_on_grid(grid, (0, 0), (9, 9), allow_diag=False, simplify=False)
+    p8 = plan_on_grid(grid, (0, 0), (9, 9), allow_diag=True, simplify=True)
+    assert len(p8) <= len(p4)

@@ -60,7 +60,7 @@ def main(argv: list[str] | None = None) -> int:
     grid = demo_grid()
     sx, sy = (int(s) for s in args.grid_start.split(","))
     gx, gy = (int(s) for s in args.grid_goal.split(","))
-    path_cells = plan_on_grid(grid, (sx, sy), (gx, gy))
+    path_cells = plan_on_grid(grid, (sx, sy), (gx, gy), allow_diag=True, simplify=True)
     waypoints = [(x * args.scale, y * args.scale) for (x, y) in path_cells]
 
     # Controller and plant
