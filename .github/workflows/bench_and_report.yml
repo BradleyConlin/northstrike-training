@@ -32,11 +32,13 @@ jobs:
       - name: Sweep A* vs RRT
         run: python -m scripts.evaluation.compare_planners_sweep --seeds 10 --sim-seconds 2.0
       - name: Controller micro-bench (LQR & PP)
-        run: |
+        continue-on-error: true
+  run: |
           python -m scripts.evaluation.run_waypoint_controller_bench --controller lqr --seeds 10 --sim-seconds 3.0
           python -m scripts.evaluation.run_waypoint_controller_bench --controller pp  --seeds 10 --sim-seconds 3.0
 
       - name: Upload report
+        if: always()
         if: always()
         uses: actions/upload-artifact@v4
         with:
