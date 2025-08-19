@@ -73,6 +73,12 @@ items:
   green_globs:
   - train.py
   - training/**
+  - configs/training/*.yaml
+  - scripts/training/*.py
+  - tests/training/*.py
+  - artifacts/training/metrics.csv
+  - artifacts/training/model_dummy.npz
+  - artifacts/training/summary.json
 - id: 9
   name: Compatibility Considerations
   seed: yellow
