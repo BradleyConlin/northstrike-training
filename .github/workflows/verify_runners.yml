@@ -1,0 +1,15 @@
+name: Verify Runners
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure all workflows pin ubuntu-22.04
+        run: |
+          if grep -R --line-number -E 'runs-on:\s*ubuntu-(latest|24\.04)' .github/workflows; then
+            echo "::error::Found workflows not pinned to ubuntu-22.04"
+            exit 1
+          fi
