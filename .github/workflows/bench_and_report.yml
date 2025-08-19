@@ -1,6 +1,7 @@
 name: bench_and_report
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -69,3 +70,4 @@ jobs:
             artifacts/controller_sweep_*.json
             artifacts/controller_sweep_*.md
           if-no-files-found: warn
+
