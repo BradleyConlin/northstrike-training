@@ -5,7 +5,8 @@ import csv
 import math
 import os
 
-from planners.astar import plan_on_grid
+from planners.astar import plan_on_grid as astar_plan
+from planners.rrt import plan_on_grid_rrt
 
 from control.pid_pos import Limits, PIDGains, PIDPos2D
 from sim.quad_2d import Quad2D, QuadParams
@@ -46,6 +47,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Waypoint demo: A* -> PID -> Quad2D")
     ap.add_argument("--grid-start", default="0,0")
     ap.add_argument("--grid-goal", default="19,9")
+    ap.add_argument("--planner", choices=["astar", "rrt"], default="astar")
+    ap.add_argument("--rrt-seed", type=int, default=0)
     ap.add_argument("--scale", type=float, default=1.0, help="meters per grid cell")
     ap.add_argument("--dt", type=float, default=0.02)
     ap.add_argument("--sim-seconds", type=float, default=30.0)
@@ -60,7 +63,13 @@ def main(argv: list[str] | None = None) -> int:
     grid = demo_grid()
     sx, sy = (int(s) for s in args.grid_start.split(","))
     gx, gy = (int(s) for s in args.grid_goal.split(","))
-    path_cells = plan_on_grid(grid, (sx, sy), (gx, gy), allow_diag=True, simplify=True)
+    path_cells = (
+        astar_plan(grid, (sx, sy), (gx, gy), allow_diag=True, simplify=True)
+        if args.planner == "astar"
+        else plan_on_grid_rrt(
+            grid, (sx, sy), (gx, gy), seed=args.rrt_seed, allow_diag=True, simplify=True
+        )
+    )
     waypoints = [(x * args.scale, y * args.scale) for (x, y) in path_cells]
 
     # Controller and plant
