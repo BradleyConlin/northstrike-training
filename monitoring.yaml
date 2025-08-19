@@ -51,6 +51,10 @@ items:
   green_globs:
   - swarm/**
   - multi_agent/**
+  - src/multi_agent/*.py
+  - scripts/multi_agent/*.py
+  - tests/multi_agent/*.py
+  - artifacts/swarm/swarm_plot.png
 - id: 7
   name: Domain-Specific Models & Tools
   seed: red
