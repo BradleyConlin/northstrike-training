@@ -6,6 +6,7 @@ on:
       - main
       - feat/*
       - feat/**
+      - ci/**
     paths:
       - '.github/workflows/bench_and_report.yml'
       - 'scripts/evaluation/**'
@@ -17,8 +18,8 @@ on:
 
 jobs:
   bench:
-    name: bench
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
@@ -41,7 +42,7 @@ jobs:
 
       - name: Sweep A* vs RRT
         continue-on-error: true
-  run: python -m scripts.evaluation.compare_planners_sweep --seeds 10 --sim-seconds 2.0
+        run: python -m scripts.evaluation.compare_planners_sweep --seeds 10 --sim-seconds 2.0
 
       - name: Controller micro-bench (LQR & PP)
         continue-on-error: true
@@ -50,26 +51,21 @@ jobs:
           python -m scripts.evaluation.run_waypoint_controller_bench --controller pp  --seeds 10 --sim-seconds 3.0
 
       - name: Debug: list artifacts dir
-        if: always()
+        if: ${{ always() }}
         run: |
-          echo '== ARTIFACTS TREE ==' && (ls -lah artifacts || true)
+          echo '== ARTIFACTS TREE =='
+          ls -lah artifacts || true
 
       - name: Upload report
-        if: always()
-        if: always()
-        if: always()
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
-        if: always()
-        uses: actions/upload-artifact@v4
-
         with:
           name: planner-bench
-path: |
-          artifacts/compare_planners_sweep.md
-          artifacts/sweep_*.csv
-          artifacts/sweep_*.json
-          artifacts/controller_run_*.csv
-          artifacts/controller_sweep_*.json
-          artifacts/controller_sweep_*.md
-
+          path: |
+            artifacts/compare_planners_sweep.md
+            artifacts/sweep_*.csv
+            artifacts/sweep_*.json
+            artifacts/controller_run_*.csv
+            artifacts/controller_sweep_*.json
+            artifacts/controller_sweep_*.md
           if-no-files-found: warn
