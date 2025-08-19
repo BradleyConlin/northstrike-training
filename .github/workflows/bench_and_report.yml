@@ -40,7 +40,8 @@ jobs:
         run: mkdir -p artifacts
 
       - name: Sweep A* vs RRT
-        run: python -m scripts.evaluation.compare_planners_sweep --seeds 10 --sim-seconds 2.0
+        continue-on-error: true
+  run: python -m scripts.evaluation.compare_planners_sweep --seeds 10 --sim-seconds 2.0
 
       - name: Controller micro-bench (LQR & PP)
         continue-on-error: true
@@ -48,17 +49,27 @@ jobs:
           python -m scripts.evaluation.run_waypoint_controller_bench --controller lqr --seeds 10 --sim-seconds 3.0
           python -m scripts.evaluation.run_waypoint_controller_bench --controller pp  --seeds 10 --sim-seconds 3.0
 
+      - name: Debug: list artifacts dir
+        if: always()
+        run: |
+          echo '== ARTIFACTS TREE ==' && (ls -lah artifacts || true)
+
       - name: Upload report
         if: always()
         if: always()
+        if: always()
         uses: actions/upload-artifact@v4
+        if: always()
+        uses: actions/upload-artifact@v4
+
         with:
           name: planner-bench
-          path: |
-            artifacts/compare_planners_sweep.md
-            artifacts/sweep_*.csv
-            artifacts/sweep_*.json
-            artifacts/controller_run_*.csv
-            artifacts/controller_sweep_*.json
-            artifacts/controller_sweep_*.md
+path: |
+          artifacts/compare_planners_sweep.md
+          artifacts/sweep_*.csv
+          artifacts/sweep_*.json
+          artifacts/controller_run_*.csv
+          artifacts/controller_sweep_*.json
+          artifacts/controller_sweep_*.md
+
           if-no-files-found: warn
