@@ -1,6 +1,12 @@
 {
-  "required_status_checks": { "strict": true, "contexts": ["test"] },
+  "required_status_checks": {
+    "strict": true,
+    "contexts": [
+      "Lint & Unit Tests / lint_and_unit",
+      "Simulation Tests / sim"
+    ]
+  },
   "enforce_admins": false,
-  "required_pull_request_reviews": null,
+  "required_pull_request_reviews": { "required_approving_review_count": 0 },
   "restrictions": null
 }
