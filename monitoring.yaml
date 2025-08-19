@@ -62,6 +62,11 @@ items:
   - aero/**
   - terrain/**
   - wind/**
+  - src/domain/*.py
+  - scripts/domain/*.py
+  - tests/domain/*.py
+  - artifacts/domain/wind_log.csv
+  - artifacts/domain/domain_checks.csv
 - id: 8
   name: Training Infrastructure & Tools
   seed: yellow
