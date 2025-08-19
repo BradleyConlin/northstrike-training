@@ -1,0 +1,26 @@
+name: compat-matrix
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ "3.10", "3.11" ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install deps
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements.txt -r requirements-dev.txt || true
+          pip install opencv-python-headless mlflow
+      - name: Smoke script
+        run: python scripts/compat/smoke.py
+      - name: CLI smoke pytest
+        run: pytest -q tests/test_cli_smoke.py

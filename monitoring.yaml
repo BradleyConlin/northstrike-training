@@ -87,6 +87,9 @@ items:
   - .python-version
   - tox.ini
   - noxfile.py
+  - .github/workflows/compat_matrix.yml
+  - docs/compatibility/*.md
+  - scripts/compat/*.py
 - id: 10
   name: MLOps & Experiment Tracking
   seed: green
