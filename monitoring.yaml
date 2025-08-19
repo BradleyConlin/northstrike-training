@@ -11,6 +11,11 @@ items:
   green_globs:
   - planning/**
   - scripts/**/plan*
+  - planners/*.py
+  - tests/test_plan_*.py
+  - scripts/planning/*.py
+  - artifacts/compare_*
+  - artifacts/sweep_*
 - id: 3
   name: Flight-Control Algorithms
   seed: yellow
