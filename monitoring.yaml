@@ -117,6 +117,10 @@ items:
   - sysid/**
   - scripts/**/fit_*
   - data/sysid/**
+  - scripts/sysid/*.py
+  - tests/sysid/*.py
+  - artifacts/sysid/est_params.json
+  - artifacts/sysid/est_diagnostics.csv
 - id: 13
   name: Fixed-Wing Control (TECS & L1)
   seed: red
