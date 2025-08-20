@@ -105,6 +105,11 @@ items:
   green_globs:
   - rl/**
   - scripts/**/train_rl*
+  - src/rl/*.py
+  - scripts/rl/*.py
+  - tests/rl/*.py
+  - artifacts/rl/summary.json
+  - artifacts/rl/eval_traj.csv
 - id: 12
   name: SysID & Flight-Model Calibration
   seed: red
