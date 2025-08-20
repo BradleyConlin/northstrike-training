@@ -127,6 +127,11 @@ items:
   green_globs:
   - control/tecs/**
   - control/l1/**
+  - src/controllers/fixedwing/*.py
+  - scripts/fixedwing/*.py
+  - tests/fixedwing/*.py
+  - artifacts/fixedwing/fw_metrics.json
+  - artifacts/fixedwing/fw_traj.csv
 - id: 14
   name: Hardware-in-the-Loop (HIL) & Bench Testing
   seed: red

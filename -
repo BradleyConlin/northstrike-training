@@ -1,6 +1,6 @@
 # 24-Point Status Snapshot
 
-**Totals:** 🟢 14 · 🟡 3 · 🔴 7
+**Totals:** 🟢 16 · 🟡 3 · 🔴 5
 
 | # | Area | Status |
 |---:|------|:------:|
@@ -15,8 +15,8 @@
 | 9 | Compatibility Considerations | 🟢 |
 | 10 | MLOps & Experiment Tracking | 🟢 |
 | 11 | RL Stack & Safety-Aware Training | 🟢 |
-| 12 | SysID & Flight-Model Calibration | 🔴 |
-| 13 | Fixed-Wing Control (TECS & L1) | 🔴 |
+| 12 | SysID & Flight-Model Calibration | 🟢 |
+| 13 | Fixed-Wing Control (TECS & L1) | 🟢 |
 | 14 | Hardware-in-the-Loop (HIL) & Bench Testing | 🟡 |
 | 15 | Domain Randomization & Sim-to-Real | 🔴 |
 | 16 | Evaluation Benchmarks & KPIs | 🟢 |
