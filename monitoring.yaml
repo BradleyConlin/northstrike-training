@@ -164,6 +164,12 @@ items:
   green_globs:
   - postdeploy/**
   - monitoring/**
+  - observability/drift_detection/*.py
+  - scripts/observability/*.py
+  - tests/observability/*.py
+  - artifacts/drift/last_drift.json
+  - artifacts/drift/drift_log.csv
+  - artifacts/drift/baseline.csv
 - id: 18
   name: Edge Packaging & Performance Budgets
   seed: red

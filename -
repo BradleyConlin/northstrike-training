@@ -1,6 +1,6 @@
 # 24-Point Status Snapshot
 
-**Totals:** 🟢 18 · 🟡 2 · 🔴 4
+**Totals:** 🟢 19 · 🟡 2 · 🔴 3
 
 | # | Area | Status |
 |---:|------|:------:|
@@ -20,7 +20,7 @@
 | 14 | Hardware-in-the-Loop (HIL) & Bench Testing | 🟢 |
 | 15 | Domain Randomization & Sim-to-Real | 🟢 |
 | 16 | Evaluation Benchmarks & KPIs | 🟢 |
-| 17 | Post-Deployment Observability & Drift | 🔴 |
+| 17 | Post-Deployment Observability & Drift | 🟢 |
 | 18 | Edge Packaging & Performance Budgets | 🔴 |
 | 19 | Data Labeling, QA & Governance | 🔴 |
 | 20 | Safety, Compliance & SOPs (Transport Canada) | 🔴 |
