@@ -1,1 +1,6 @@
-default:\n  imu_std: [0.001, 0.02]\n  baro_std: [0.2, 1.5]\n  gps_hdop: [0.5, 2.0]\n
+profiles:
+  default:
+    imu_gyro_std:  [0.001, 0.01]
+    imu_accel_std: [0.002, 0.02]
+    gps_pos_std_m: [0.1,  1.5]
+    cam_brightness: [0.8, 1.2]

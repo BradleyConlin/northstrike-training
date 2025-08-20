@@ -138,12 +138,20 @@ items:
   green_globs:
   - hil/**
   - bench/**
+  - hil/scripts/*.py
+  - tests/hil/*.py
+  - artifacts/hil/session_metrics.json
+  - artifacts/hil/hil_log.csv
 - id: 15
   name: Domain Randomization & Sim-to-Real
   seed: red
   green_globs:
   - randomization/**
   - sim2real/**
+  - simulation/domain_randomization/*.yaml
+  - simulation/domain_randomization/scripts/*.py
+  - tests/sim_randomization/*.py
+  - artifacts/randomization/last_profile.json
 - id: 16
   name: Evaluation Benchmarks & KPIs
   seed: green

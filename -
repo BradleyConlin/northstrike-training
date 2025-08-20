@@ -1,6 +1,6 @@
 # 24-Point Status Snapshot
 
-**Totals:** 🟢 16 · 🟡 3 · 🔴 5
+**Totals:** 🟢 18 · 🟡 2 · 🔴 4
 
 | # | Area | Status |
 |---:|------|:------:|
@@ -17,8 +17,8 @@
 | 11 | RL Stack & Safety-Aware Training | 🟢 |
 | 12 | SysID & Flight-Model Calibration | 🟢 |
 | 13 | Fixed-Wing Control (TECS & L1) | 🟢 |
-| 14 | Hardware-in-the-Loop (HIL) & Bench Testing | 🟡 |
-| 15 | Domain Randomization & Sim-to-Real | 🔴 |
+| 14 | Hardware-in-the-Loop (HIL) & Bench Testing | 🟢 |
+| 15 | Domain Randomization & Sim-to-Real | 🟢 |
 | 16 | Evaluation Benchmarks & KPIs | 🟢 |
 | 17 | Post-Deployment Observability & Drift | 🔴 |
 | 18 | Edge Packaging & Performance Budgets | 🔴 |
