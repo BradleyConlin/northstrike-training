@@ -1,0 +1,4 @@
+# minimal, safe-ish parameter tweaks
+MIS_TAKEOFF_ALT: 10     # m AGL
+MIS_DIST_1WP: 5         # meters to accept first WP
+MIS_YAW_TMT: 0          # disable mission yaw timeout

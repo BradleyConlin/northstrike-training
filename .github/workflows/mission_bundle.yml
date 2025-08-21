@@ -1,0 +1,23 @@
+name: Mission Bundle Validate
+on:
+  push:
+    paths: ["mission/**","schemas/**","scripts/mission/**"]
+  pull_request:
+    paths: ["mission/**","schemas/**","scripts/mission/**"]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.10" }
+      - run: python -m pip install --upgrade pip
+      - run: pip install pyyaml jsonschema
+      - name: Validate default demo bundle
+        run: |
+          python scripts/mission/validate_bundle.py \
+            --bundle mission/bundles/demo_square \
+            --out-json artifacts/mission_last_check.json
+      - name: Show summary
+        run: cat artifacts/mission_last_check.json
