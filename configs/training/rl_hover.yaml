@@ -1,1 +1,5 @@
-algo: PPO\nenv: Px4GzHoverEnv-v0\nreward: {hover_pos_w: 1.0, vel_pen: 0.2, crash_pen: 10.0}\nsafety:\n  geofence: {x: [-50,50], y: [-50,50], z: [1,30]}\ncurriculum:\n  wind_mps: [0,8]\n
+# Placeholder for future hyperparams. The training script currently uses CLI args.
+algo: PPO
+env: Px4GzHoverEnv-v0
+total_steps: 10000
+udp_url: "udp://:14540"

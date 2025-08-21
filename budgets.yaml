@@ -1,0 +1,15 @@
+# Performance & packaging budgets for CI/local checks
+image:
+  max_size_mb: 2500          # fail if image exceeds this size
+
+inference_cpu:
+  max_p50_ms: 15.0           # median forward latency on CPU
+  max_p95_ms: 30.0           # 95th percentile
+
+throughput:
+  min_fps: 60.0              # frames/sec for a dummy 224x224 model
+
+# PX4/SITL related (local-only, not in CI)
+offboard:
+  min_rate_hz: 8.0           # we expect >= 8Hz setpoint stream
+  connect_timeout_s: 20.0    # connecting to PX4 should be quick locally

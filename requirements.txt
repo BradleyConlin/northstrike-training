@@ -20,3 +20,8 @@ mavsdk
 prometheus-client
 paho-mqtt
 
+
+gymnasium
+stable-baselines3
+mavsdk
+numpy

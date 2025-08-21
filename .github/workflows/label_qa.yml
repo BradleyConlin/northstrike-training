@@ -1,0 +1,27 @@
+name: Label QA
+on:
+  pull_request:
+  push:
+    branches: [ main, feat/** ]
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install deps
+        run: pip install pyyaml
+      - name: Run dataset QA (skip if no data/)
+        run: |
+          if [ -d data/images ] && [ -d data/labels ]; then
+            python scripts/labeling/qa_check.py \
+              --images data/images \
+              --labels data/labels \
+              --labelmap configs/labeling/labelmap.yaml \
+              --json-out artifacts/label_qa_ci.json
+          else
+            echo "No dataset present; skipping QA."
+          fi

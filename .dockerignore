@@ -1,0 +1,45 @@
+# VCS & build
+.git
+.gitignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.o
+.build/
+dist/
+build/
+.eggs/
+*.egg-info/
+
+# large or local-only
+artifacts/
+datasets/
+data/
+models/
+secrets/
+observability/dashboards/
+*.ulg
+*.bag
+*.csv
+*.png
+*.jpg
+*.jpeg
+*.mp4
+
+# caches
+.cache/
+.pip/
+.venv/
+venv/
+ENV/
+env/
+.mypy_cache/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# IDEs
+.vscode/
+.idea/
+*.swp

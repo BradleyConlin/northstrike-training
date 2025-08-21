@@ -1,0 +1,5 @@
+# ultra-lean runtime for eval/SITL (no torch)
+numpy==2.2.6
+gymnasium==1.2.0
+mavsdk==3.9.0
+pyyaml==6.0.2

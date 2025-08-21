@@ -1,0 +1,7 @@
+# Order matters: class ID is index in this list
+classes:
+  - drone
+  - person
+  - vehicle
+  - obstacle
+  - landing_pad

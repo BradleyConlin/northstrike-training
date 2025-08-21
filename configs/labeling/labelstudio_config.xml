@@ -1,0 +1,10 @@
+<View>
+  <Image name="img" value="$image"/>
+  <RectangleLabels name="label" toName="img">
+    <Label value="drone" background="#7aa2f7"/>
+    <Label value="person" background="#9ece6a"/>
+    <Label value="vehicle" background="#e0af68"/>
+    <Label value="obstacle" background="#f7768e"/>
+    <Label value="landing_pad" background="#bb9af7"/>
+  </RectangleLabels>
+</View>
