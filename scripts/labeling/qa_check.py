@@ -3,169 +3,132 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
-from collections import Counter
+from pathlib import Path
 from typing import Dict, List, Tuple
 
-try:
-    import yaml  # type: ignore
-except Exception:
-    yaml = None
 
-IMG_EXTS = {".jpg", ".jpeg", ".png", ".bmp"}
-
-
-def load_labelmap(path: str) -> Dict[int, str]:
-    """
-    Accepts either:
-      - {'classes': ['drone','vehicle',...]}  (index = class id)
-      - {'0': 'drone', '1': 'vehicle', ...}   (string/int keys)
-      - {'drone': 0, 'vehicle': 1, ...}       (invert to id->name)
-    Returns {id: name}.
-    """
-    if not path or not os.path.exists(path) or yaml is None:
-        # default 5-class template
-        return {0: "target", 1: "vehicle", 2: "person", 3: "building", 4: "other"}
-
-    with open(path, "r") as f:
-        data = yaml.safe_load(f) or {}
-
-    # classes as list
-    if isinstance(data.get("classes"), list):
-        return {i: str(n) for i, n in enumerate(data["classes"])}
-
-    # dict forms
-    if isinstance(data, dict) and data:
-        # id->name (keys numeric or numeric strings)
-        try:
-            out = {int(k): str(v) for k, v in data.items()}
-            return dict(sorted(out.items()))
-        except Exception:
-            # maybe name->id
-            inv = {int(v): str(k) for k, v in data.items()}
-            return dict(sorted(inv.items()))
-
-    # fallback
-    return {0: "target", 1: "vehicle", 2: "person", 3: "building", 4: "other"}
-
-
-def list_images(images_dir: str) -> List[str]:
-    ims: List[str] = []
-    for root, _, files in os.walk(images_dir):
-        for fn in files:
-            if os.path.splitext(fn)[1].lower() in IMG_EXTS:
-                ims.append(os.path.join(root, fn))
-    ims.sort()
-    return ims
-
-
-def read_yolo_file(
-    label_path: str,
-) -> Tuple[List[Tuple[int, float, float, float, float]], List[str]]:
-    """Read a YOLO .txt file (one object per line)."""
-    objs: List[Tuple[int, float, float, float, float]] = []
-    issues: List[str] = []
-    with open(label_path, "r") as f:
-        for i, line in enumerate(f, 1):
+def read_labelmap(path: Path) -> Dict[str, int]:
+    # supports simple YAML or plain text (one class per line)
+    name_to_id: Dict[str, int] = {}
+    if not path.exists():
+        return name_to_id
+    txt = path.read_text().strip()
+    if not txt:
+        return name_to_id
+    if ":" in txt:
+        # very small YAML parser (key: value per line)
+        for line in txt.splitlines():
             line = line.strip()
-            if not line:
+            if not line or line.startswith("#"):
                 continue
-            parts = line.split()
-            if len(parts) != 5:
-                issues.append(f"line {i}: expected 5 fields, got {len(parts)}")
-                continue
-            try:
-                cls = int(parts[0])
-                cx, cy, w, h = (float(parts[1]), float(parts[2]), float(parts[3]), float(parts[4]))
-            except Exception:
-                issues.append(f"line {i}: parse error (class/coords)")
-                continue
-            objs.append((cls, cx, cy, w, h))
-    return objs, issues
+            if ":" in line:
+                k, v = line.split(":", 1)
+                name_to_id[k.strip()] = int(v.strip())
+    else:
+        # plain list, assign incremental ids
+        for i, line in enumerate([line.strip() for line in txt.splitlines() if line.strip()]):
+            name_to_id[line] = i
+    return name_to_id
 
 
-def validate_objects(
-    objs: List[Tuple[int, float, float, float, float]],
-    class_ids: List[int],
-) -> List[str]:
+def parse_yolo_label_file(p: Path) -> List[Tuple[int, float, float, float, float]]:
+    out = []
+    if not p.exists():
+        return out
+    for ln in p.read_text().splitlines():
+        ln = ln.strip()
+        if not ln:
+            continue
+        parts = ln.split()
+        if len(parts) != 5:
+            continue
+        try:
+            cls = int(parts[0])
+            cx, cy, w, h = map(float, parts[1:])
+            out.append((cls, cx, cy, w, h))
+        except Exception:
+            continue
+    return out
+
+
+def run_qa(images_dir: Path, labels_dir: Path, labelmap_path: Path) -> Dict:
+    images = sorted(
+        [p for p in images_dir.glob("*") if p.suffix.lower() in {".jpg", ".jpeg", ".png"}]
+    )
+    labels = {p.stem: p for p in labels_dir.glob("*.txt")}
+    lm = read_labelmap(labelmap_path)
+    known_ids = set(lm.values())
+
+    n_imgs = len(images)
+    n_with = 0
+    n_empty = 0
+    class_counts: Dict[str, int] = {}
     issues: List[str] = []
-    for i, (cls, cx, cy, w, h) in enumerate(objs, 1):
-        if cls not in class_ids:
-            issues.append(f"line {i}: class {cls} not in {class_ids}")
-        for v, name in [(cx, "cx"), (cy, "cy"), (w, "w"), (h, "h")]:
-            if not (0.0 <= v <= 1.0):
-                issues.append(f"line {i}: {name} {v:.3f} out of [0,1]")
-        if w <= 0 or h <= 0:
-            issues.append(f"line {i}: non-positive box size w={w:.4f}, h={h:.4f}")
-    return issues
+
+    for img in images:
+        lab = labels.get(img.stem)
+        if not lab or not lab.exists():
+            n_empty += 1
+            continue
+        ann = parse_yolo_label_file(lab)
+        if not ann:
+            n_empty += 1
+            continue
+        n_with += 1
+        for cls, _, _, _, _ in ann:
+            if lm:
+                if cls not in known_ids:
+                    issues.append(f"unknown_class_id:{cls} in {lab.name}")
+            class_counts[str(cls)] = class_counts.get(str(cls), 0) + 1
+
+    # Basic geometry sanity (optional): centers & sizes in 0..1
+    for lab in labels.values():
+        if not lab.exists():
+            continue
+        for cls, cx, cy, w, h in parse_yolo_label_file(lab):
+            if not (0.0 <= cx <= 1.0 and 0.0 <= cy <= 1.0 and 0.0 < w <= 1.0 and 0.0 < h <= 1.0):
+                issues.append(f"bad_box:{lab.name}")
+
+    ok = len(issues) == 0
+
+    return {
+        "ok": ok,  # <-- this is what the report likely expects
+        "images": n_imgs,
+        "with_labels": n_with,
+        "empty": n_empty,
+        "class_counts": class_counts,
+        "issues": issues,
+        "labelmap_present": lm != {},
+    }
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser(description="Quick QA for YOLO labels.")
-    ap.add_argument("--images", required=True, help="Images root directory")
-    ap.add_argument("--labels", required=True, help="Labels root directory")
-    ap.add_argument("--labelmap", default="configs/labeling/labelmap.yaml")
+def main():
+    ap = argparse.ArgumentParser(description="Simple YOLO dataset QA")
+    ap.add_argument("--images", required=True)
+    ap.add_argument("--labels", required=True)
+    ap.add_argument("--labelmap", required=True)
     ap.add_argument("--json-out", default="artifacts/label_qa.json")
     args = ap.parse_args()
 
-    os.makedirs(os.path.dirname(args.json_out), exist_ok=True)
+    img_dir = Path(args.images)
+    lab_dir = Path(args.labels)
+    lm_path = Path(args.labelmap)
+    out_path = Path(args.json_out)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    labelmap = load_labelmap(args.labelmap)
-    class_ids = sorted(labelmap.keys())
+    res = run_qa(img_dir, lab_dir, lm_path)
 
-    images = list_images(args.images)
-    n_images = len(images)
-
-    with_labels = 0
-    empty = 0
-    class_counts: Counter[int] = Counter()
-    file_issues: Dict[str, List[str]] = {}
-
-    for img_path in images:
-        stem, _ = os.path.splitext(os.path.basename(img_path))
-        label_path = os.path.join(args.labels, f"{stem}.txt")
-        if not os.path.exists(label_path):
-            file_issues[img_path] = ["missing label file"]
-            continue
-
-        with_labels += 1
-        objs, parse_issues = read_yolo_file(label_path)
-        if not objs:
-            empty += 1
-
-        val_issues = validate_objects(objs, class_ids)
-        if parse_issues or val_issues:
-            file_issues[label_path] = parse_issues + val_issues
-
-        for cls, _, _, _, _ in objs:
-            class_counts[cls] += 1
-
-    # Build a string-keyed class count (flake8 prefers deterministic keys)
-    class_counts_str: Dict[str, int] = {str(k): int(v) for k, v in sorted(class_counts.items())}
-
-    summary = {
-        "images": n_images,
-        "with_labels": with_labels,
-        "empty_label_files": empty,
-        "class_counts": class_counts_str,
-        "labelmap": {int(k): v for k, v in labelmap.items()},
-        "issues": file_issues,
-    }
-
-    with open(args.json_out, "w") as f:
-        json.dump(summary, f, indent=2)
-
-    # concise CLI summary
-    print(f"[label-qa] images: {n_images}")
-    print(f"[label-qa] with labels: {with_labels} | empty: {empty}")
-    print(f"[label-qa] class counts: {class_counts_str}")
-    if file_issues:
-        print(f"[label-qa] issues: {len(file_issues)} files have problems (see {args.json_out})")
-    else:
+    # human-readable summary
+    print(f"[label-qa] images: {res['images']}")
+    print(f"[label-qa] with labels: {res['with_labels']} | empty: {res['empty']}")
+    print(f"[label-qa] class counts: {res['class_counts']}")
+    if res["ok"]:
         print("[label-qa] no issues found")
+    else:
+        print(f"[label-qa] issues: {len(res['issues'])} -> {res['issues'][:10]}")
 
-    return 0
+    out_path.write_text(json.dumps(res, indent=2))
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

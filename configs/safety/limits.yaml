@@ -1,0 +1,9 @@
+# Operational safety limits (Canada baseline)
+altitude_max_m: 120         # 400 ft AGL
+wind_max_mps: 10            # adjust per platform limits
+allow_night: false
+min_distance_people_m: 30   # adapt per aircraft class
+
+# Optional simple geofence polygon (lat,lon). Leave empty to skip.
+geofence:
+  polygon: []  # e.g., [{lat: 45.4215, lon: -75.6972}, ...]

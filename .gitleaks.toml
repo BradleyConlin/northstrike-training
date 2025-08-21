@@ -1,0 +1,7 @@
+[allowlist]
+paths = [
+  '''^mlflow_server/''',
+  '''^mlruns/''',
+  '''^artifacts/''',
+  '''^data/'''
+]

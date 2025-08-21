@@ -1,0 +1,16 @@
+name: demo_square
+location:
+  site: "PX4 SITL default"
+  lat: 0.0
+  lon: 0.0
+  agl_m: 10
+timeline:
+  takeoff_agl_m: 10
+  legs_m:
+    - [10, 0]
+    - [0, 10]
+    - [-10, 0]
+    - [0, -10]
+expected_wind_mps: 3
+night: false
+notes: "Demo plan for validator."

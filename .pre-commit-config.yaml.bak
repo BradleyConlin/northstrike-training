@@ -1,24 +1,46 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 24.4.2
-    hooks: [{id: black}]
+    rev: 23.12.1
+    hooks:
+      - id: black
+
   - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks: [{id: isort}]
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
-    hooks: [{id: flake8}]
+    rev: 5.12.0
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.4.0
-    hooks: [{id: detect-secrets}]
+    hooks:
+      - id: detect-secrets
+        # exclude the config itself + the example env to avoid false positives
+        args: ["--exclude-files", ".pre-commit-config.yaml|configs/secrets/\\.env\\.example"]
+        stages: [pre-commit]
 
+  - repo: local
+    hooks:
+      - id: label-qa
+        name: Dataset QA (YOLO)
+        entry: bash scripts/labeling/precommit_label_qa.sh
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
 
-# ---- Label QA hook (skips if no dataset present) ----
-- repo: local
-  hooks:
-    - id: label-qa
-      name: Dataset QA (YOLO)
-      entry: bash scripts/labeling/precommit_label_qa.sh
-      language: system
-      pass_filenames: false
-      stages: [commit]
+      - id: safety-validate-flight-plan
+        name: Safety: validate mission/flight_plan.yaml
+        entry: python scripts/safety/validate_flight_plan.py --plan mission/flight_plan.yaml --limits configs/safety/limits.yaml --out-json artifacts/safety_last_check.json
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: forbid-dotenv
+        name: Secrets: forbid committing dotenvs and sensitive files
+        entry: bash scripts/secrets/forbid_dotenv_staged.sh
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]

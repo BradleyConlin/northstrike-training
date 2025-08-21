@@ -1,0 +1,24 @@
+name: Safety Gate
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'mission/**'
+      - 'configs/safety/**'
+      - 'scripts/safety/**'
+      - 'docs/sops/**'
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.10' }
+      - run: pip install pyyaml
+      - name: Validate flight plan (skip if none)
+        run: |
+          if [ -f mission/flight_plan.yaml ]; then
+            python scripts/safety/validate_flight_plan.py --plan mission/flight_plan.yaml --limits configs/safety/limits.yaml --out-json artifacts/safety_last_check.json
+          else
+            echo "No mission/flight_plan.yaml; skipping."
+          fi
